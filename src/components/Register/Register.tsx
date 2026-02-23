@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
 import type { FormItemProps, FormProps } from 'antd'
 import { 
-  AutoComplete, 
   Checkbox,
   Button, 
   Drawer, 
   Form, 
   Input, 
-  InputNumber,
   Select, 
   Space 
 } from 'antd';
-import type { DefaultOptionType } from 'antd/es/select';
 
 const formItemLayout: FormProps = {
   labelCol: {
@@ -57,22 +54,9 @@ const App: React.FC = () => {
   };
 
 
-  const [autoCompleteResult, setAutoCompleteResult] = useState<string[]>([]);
-
-  const onWebsiteChange = (value: string) => {
-    setAutoCompleteResult(
-      value ? ['.com', '.org', '.net'].map((domain) => `${value}${domain}`) : [],
-    );
-  };
-
-  const websiteOptions = autoCompleteResult.map<DefaultOptionType>((website) => ({
-    label: website,
-    value: website,
-  }));
-
   return (
     <>
-      <Button color="primary" variant="text" onClick={showDrawer}>
+      <Button color="primary" variant="link" onClick={showDrawer}>
             去注册
           </Button>
       <Drawer
@@ -85,14 +69,6 @@ const App: React.FC = () => {
             paddingBottom: 80,
           },
         }}
-        extra={
-          <Space>
-            <Button onClick={onClose}>Cancel</Button>
-            <Button onClick={onClose} type="primary">
-              Submit
-            </Button>
-          </Space>
-        }
       >
         <Form
           {...formItemLayout}
@@ -157,8 +133,8 @@ const App: React.FC = () => {
           </Form.Item>
 
           <Form.Item
-            name="nickname"
-            label="Nickname"
+            name="username"
+            label="username"
             tooltip="What do you want others to call you?"
             rules={[{ required: true, message: 'Please input your nickname!', whitespace: true }]}
           >
@@ -178,10 +154,8 @@ const App: React.FC = () => {
             </Space.Compact>
           </Form.Item>
 
-
-
           <Form.Item
-            name="gender"
+            name="role"
             label="身份"
             rules={[{ required: true, message: 'Please select gender!' }]}
           >
@@ -190,7 +164,6 @@ const App: React.FC = () => {
               options={[
                 { label: 'Admin', value: 'admin' },
                 { label: 'Merchant', value: 'merchant' },
-                { label: 'Other', value: 'other' },
               ]}
             />
           </Form.Item>

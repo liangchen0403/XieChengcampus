@@ -2,7 +2,6 @@ import React from 'react'
 import './Welcome.css'
 import { Carousel , Button} from 'antd';
 import Login from '../../components/Login/Login'
-import Register from '../../components/Register/Register'
 
 const contentStyle: React.CSSProperties = {
   margin: 0,

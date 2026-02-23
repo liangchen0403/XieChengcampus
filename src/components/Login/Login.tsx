@@ -1,6 +1,6 @@
 import React from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Flex, Form, Input } from 'antd';
+import { Button, Checkbox, Flex, Form, Input, Select } from 'antd';
 import Register from '../../components/Register/Register';
 
 const App: React.FC = () => {
@@ -30,13 +30,27 @@ const App: React.FC = () => {
         >
           <Input prefix={<LockOutlined />} type="password" placeholder="Password" />
         </Form.Item>
-        <Form.Item>
+        {
+          /*身份选择*/
+        }
+        {/* <Form.Item
+            name="gender"
+            rules={[{ required: true, message: 'Please select gender!' }]}
+          >
+          <Select
+            style={{ width: '100%', maxWidth: 360 }}
+            allowClear
+            options={[{ value: 'admin', label: 'admin' },{ value: 'merchant', label: 'merchant' }]}
+            placeholder="select it"
+          />
+        </Form.Item> */}
+        {/* <Form.Item>
           <Flex justify="space-between" align="center">
             <Form.Item name="remember" valuePropName="checked" noStyle>
               <Checkbox>Remember me</Checkbox>
             </Form.Item>
           </Flex>
-        </Form.Item>
+        </Form.Item> */}
         <Form.Item>
           <Button block type="primary" htmlType="submit">
             Log in
