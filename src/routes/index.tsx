@@ -4,8 +4,13 @@ import {Navigate} from 'react-router-dom'
 
 import Welcome from '../pages/Welcome/Welcome'
 import Login from '../components/Login/Login'
-import Test from '../pages/Merchant/test'
-import Test2 from '../pages/Merchant/test2'
+
+import MerchantHome from '../pages/Merchant/MerchantHome'
+import HotelManage from '../pages/Merchant/HotelManage'
+import RoomManage from '../pages/Merchant/RoomManage'
+import Notice from '../pages/Merchant/Notice'
+
+
 const Register = lazy(() => import('../pages/Register'));
 const MerchantDashboard = lazy(() => import('../pages/Merchant/Merchant'));
 const AdminPanel = lazy(() => import('../pages/AdminPanel'));
@@ -50,12 +55,20 @@ export const routes: RouteConfig[] = [
 		),
 		children:[
 			{
-				path:'test',
-				element:<Test/>
+				path:'MerchantHome',
+				element:<MerchantHome/>
 			},
 			{
-				path:'test2',
-				element:<Test2/>
+				path:'HotelManage',
+				element:<HotelManage/>
+			},
+			{
+				path:'RoomManage',
+				element:<RoomManage/>
+			},
+			{
+				path:'Notice',
+				element:<Notice/>
 			},
 		]
 	},

@@ -9,42 +9,38 @@ import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 type MenuItem = Required<MenuProps>['items'][number];
 
 const items: MenuItem[] = [
-  {
-    label: '111111111',
-    key: '/merchant/test',
-    icon: <MailOutlined />,
-  },
-  {
-    label: 'Navigation Three - Submenu',
-    key: '/merchant/submenu',
-    icon: <SettingOutlined />,
-    children: [
-      {
-        type: 'group',
-        label: 'Item 1',
-        children: [
-          { label: 'Option 1', key: '/merchant/test2' },
-          { label: 'Option 2', key: '/merchant/setting2' },
-        ],
-      },
-      {
-        type: 'group',
-        label: 'Item 2',
-        children: [
-          { label: 'Option 3', key: '/merchant/setting3' },
-          { label: 'Option 4', key: '/merchant/setting4' },
-        ],
-      },
-    ],
-  },
-  {
-    key: '/alipay',
-    label: (
-      <a href="https://ant.design" target="_blank" rel="noopener noreferrer">
-        Navigation Four - Link
-      </a>
-    ),
-  },
+    {
+        label: (
+            <img
+                src="https://ts3.tc.mm.bing.net/th/id/OIP-C.2d5X7HBz2EsEQIIxmwf92AHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"
+                alt="Logo"
+                style={{ height: 60, verticalAlign: 'middle' }}
+            />
+        ),
+        key: '#',
+        disabled: true,
+        style: { cursor: 'default', background: 'transparent' },
+    },
+    {
+        label: '首页',
+        key: '/merchant/MerchantHome',
+        icon: <MailOutlined />,
+    },
+    {
+        label: '酒店管理',
+        key: '/merchant/HotelManage',
+        icon: <SettingOutlined />,
+    },
+    {
+        label: '房型管理',
+        key: '/merchant/RoomManage',
+        icon: <SettingOutlined />,
+    },
+    {
+        label: '消息通知',
+        key: '/merchant/Notice',
+        icon: <SettingOutlined />,
+    },
 ];
 
 const App: React.FC = () => {
@@ -66,13 +62,13 @@ const App: React.FC = () => {
 
   return (
     <>
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width:'100vw' }}>
             <Menu 
                 onClick={onClick} 
                 selectedKeys={[current]} 
                 mode="horizontal" 
                 items={items}
-                style={{ width: '100%',marginTop:'20px' }}
+                style={{ width: '100%', height:'60px', fontSize:'20px', paddingTop:'5px', marginBottom:'10px' }}
             />
             <div style={{ flex: 1 }}>
                 <Outlet></Outlet>

@@ -2,6 +2,8 @@ import React from 'react'
 import './Welcome.css'
 import { Carousel , Button} from 'antd';
 import Login from '../../components/Login/Login'
+import homePage from '../../common/image/homePage.png'
+
 
 const contentStyle: React.CSSProperties = {
   margin: 0,
@@ -9,7 +11,7 @@ const contentStyle: React.CSSProperties = {
   color: '#fff',
   lineHeight: '160px',
   textAlign: 'center',
-  background: '#364d79',
+  background: `url(${homePage}) center/cover no-repeat`,
 };
 export default function Welcome() {
   return (
@@ -17,7 +19,7 @@ export default function Welcome() {
       <Carousel arrows dotPlacement="start" infinite={false}>
         <div>
           <div style={contentStyle}>
-            <div className="systemTitle">易宿酒店管理系统</div>
+            <div className="systemTitle" >易宿酒店管理系统</div>
           </div>
         </div>
         <div>
