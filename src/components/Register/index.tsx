@@ -7,8 +7,10 @@ import {
   Form, 
   Input, 
   Select, 
-  Space 
+  Space, 
+  message 
 } from 'antd';
+import { register } from '../../services/authService';
 
 const formItemLayout: FormProps = {
   labelCol: {
@@ -37,6 +39,7 @@ const tailFormItemLayout: FormItemProps = {
 //抽屉展开组件
 const App: React.FC = () => {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 //展开回调函数
   const showDrawer = () => {
     setOpen(true);
@@ -49,8 +52,22 @@ const App: React.FC = () => {
 //注册组件
   const [form] = Form.useForm();
 
-  const onFinish = (values: any) => {
-    console.log('Received values of form: ', values);
+  const onFinish = async (values: any) => {
+    try {
+      setLoading(true);
+      // 移除确认密码和协议字段，只发送后端需要的字段
+      const { confirm, agreement, ...registerData } = values;
+      const response = await register(registerData);
+      message.success(response.message || '注册成功');
+      // 关闭抽屉
+      setOpen(false);
+      // 重置表单
+      form.resetFields();
+    } catch (error: any) {
+      message.error(error.message || '注册失败，请重试');
+    } finally {
+      setLoading(false);
+    }
   };
 
 
@@ -183,7 +200,7 @@ const App: React.FC = () => {
             </Checkbox>
           </Form.Item>
           <Form.Item {...tailFormItemLayout}>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" loading={loading}>
               Register
             </Button>
           </Form.Item>

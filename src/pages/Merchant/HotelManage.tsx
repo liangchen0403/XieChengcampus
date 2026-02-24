@@ -1,9 +1,11 @@
 import { Table, Select, Space, Input, Button, message, Tag } from 'antd';
 import type { ColumnsType, TableProps } from 'antd/es/table';
 import React, { useState, useEffect } from 'react';
+import NewHotel from '../../components/NewHotel';
 import axios from 'axios'; 
 const { Option } = Select;
 const { Search } = Input;
+
 
 interface HotelItem {
   id: number;
@@ -335,6 +337,7 @@ const HotelTable: React.FC = () => {
           <Button type="primary" onClick={fetchHotelData} loading={loading}>
             刷新
           </Button>
+          <NewHotel />
         </Space>
       </div>
 

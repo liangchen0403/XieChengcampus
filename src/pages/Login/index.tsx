@@ -1,12 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Flex, Form, Input, Select } from 'antd';
+import { Button, Form, Input, message } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import Register from '../../components/Register';
+import { login } from '../../services/authService';
+import type { LoginRequest } from '../../types/auth';
 
 const App: React.FC = () => {
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
   //登录提交函数
-  const onFinish = (values: any) => {
-    console.log('Received values of form: ', values);
+  const onFinish = async (values: LoginRequest) => {
+    setLoading(true);
+    try {
+      const response = await login(values);
+      if (response.code === 200) {
+        // 存储token到localStorage
+        localStorage.setItem('token', response.data?.token || '');
+        localStorage.setItem('user', JSON.stringify(response.data?.user));
+        localStorage.setItem('token_expiry', (Date.now() + (response.data?.expiresIn || 0) * 1000).toString());
+        
+        message.success('登录成功');
+        // 根据用户角色跳转到不同页面
+        if (response.data?.user.role === 'admin') {
+          navigate('/admin');
+        } else if (response.data?.user.role === 'merchant') {
+          navigate('/merchant');
+        } else {
+          navigate('/');
+        }
+      } else {
+        message.error(response.message || '登录失败');
+      }
+    } catch (error) {
+      console.error('登录错误:', error);
+      message.error('登录失败，请检查网络或账号密码');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -31,7 +63,7 @@ const App: React.FC = () => {
           <Input prefix={<LockOutlined />} type="password" placeholder="Password" />
         </Form.Item>
         <Form.Item>
-          <Button block type="primary" htmlType="submit">
+          <Button block type="primary" htmlType="submit" loading={loading}>
             Log in
           </Button>
           or <Register/>
@@ -41,4 +73,3 @@ const App: React.FC = () => {
   );
 };
 export default App;
-
