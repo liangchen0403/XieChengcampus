@@ -306,7 +306,7 @@ export const addRoom = async (hotelId: number, formData: FormData): Promise<{ co
   }
 };
 
-// 发布酒店
+// 下线酒店
 export const publishHotel = async (hotelId: number): Promise<{ code: number; message: string }> => {
   const token = localStorage.getItem('token');
   const response = await axios.post<{ code: number; message: string }>(
@@ -319,4 +319,63 @@ export const publishHotel = async (hotelId: number): Promise<{ code: number; mes
     }
   );
   return response.data;
+};
+
+// 管理员获取酒店列表
+export interface AdminHotel {
+  id: number;
+  name: string;
+  address: string;
+  star: number;
+  rating: number;
+  priceRange: { min: number; max: number };
+  coverImage: string;
+  status: string;
+  auditStatus: string;
+  auditComment: string;
+  merchant: {
+    id: number;
+    username: string;
+    email: string;
+    phone: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminHotelResponse {
+  code: number;
+  data: {
+    total: number;
+    page: number;
+    pageSize: number;
+    items: AdminHotel[];
+  };
+}
+
+export const getAdminHotelList = async (
+  page: number = 2,
+  pageSize: number = 10,
+  status: string = '',
+  merchantId: string = ''
+): Promise<AdminHotelResponse['data']> => {
+  const token = localStorage.getItem('token');
+  const response = await axios.get<AdminHotelResponse>('/api/admin/hotels', {
+    params: {
+      page,
+      pageSize,
+      status,
+      merchantId,
+    },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  
+  if (response.data.code === 200) {
+    console.log('获取酒店列表成功:', response.data.data);
+    return response.data.data;
+  } else {
+    throw new Error('获取酒店列表失败');
+  }
 };

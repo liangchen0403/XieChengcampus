@@ -19,7 +19,7 @@ const contentStyle: React.CSSProperties = {
   minHeight: 120,
   lineHeight: '120px',
   color: '#fff',
-  backgroundColor: '#0958d9',
+//   backgroundColor: '#0958d9',
 };
 
 const siderStyle: React.CSSProperties = {
