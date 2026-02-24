@@ -379,3 +379,38 @@ export const getAdminHotelList = async (
     throw new Error('获取酒店列表失败');
   }
 };
+
+// 审核酒店
+export interface AuditHotelRequest {
+  status: 'approved' | 'rejected';
+  comment: string;
+}
+
+export interface AuditHotelResponse {
+  code: number;
+  message: string;
+}
+
+export const auditHotel = async (
+  hotelId: number,
+  auditData: AuditHotelRequest
+): Promise<AuditHotelResponse> => {
+  const token = localStorage.getItem('token');
+  const response = await axios.post<AuditHotelResponse>(
+    `/api/admin/hotels/${hotelId}/audit`,
+    auditData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+  
+  if (response.data.code === 200) {
+    console.log('审核酒店成功:', response.data);
+    return response.data;
+  } else {
+    throw new Error('审核酒店失败');
+  }
+};

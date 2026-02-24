@@ -49,6 +49,7 @@ const ShowHotel: React.FC = () => {
         page={page}
         pageSize={pageSize}
         onPaginationChange={handlePaginationChange}
+        title="酒店总览"
       />
     </div>
   );

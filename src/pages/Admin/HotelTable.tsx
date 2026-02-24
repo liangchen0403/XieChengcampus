@@ -198,6 +198,8 @@ interface HotelTableProps {
   page: number;
   pageSize: number;
   onPaginationChange: (current: number, size: number) => void;
+  title?: string;
+  customColumns?: ColumnsType<AdminHotel>;
 }
 
 const HotelTable: React.FC<HotelTableProps> = ({
@@ -207,17 +209,22 @@ const HotelTable: React.FC<HotelTableProps> = ({
   page,
   pageSize,
   onPaginationChange,
+  title = '酒店总览',
+  customColumns = [],
 }) => {
+  // Combine default columns with custom columns
+  const combinedColumns = [...columns, ...customColumns];
+
   return (
     <Flex vertical gap="middle">
       <Table
         loading={loading}
         dataSource={hotels}
-        columns={columns}
+        columns={combinedColumns}
         rowKey="id"
         classNames={classNames}
         styles={stylesFn}
-        title={() => '酒店总览'}
+        title={() => title}
         pagination={{
           current: page,
           pageSize: pageSize,
@@ -229,7 +236,7 @@ const HotelTable: React.FC<HotelTableProps> = ({
           showQuickJumper: true,
         }}
         scroll={{
-          x: 1500, // 设置最小宽度，确保表格有横向滚动条
+          x: 1600, // Increased width to accommodate action column
           y: 600, // 设置最大高度，确保表格有纵向滚动条
         }}
         size="middle"
