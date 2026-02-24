@@ -1,12 +1,89 @@
 import type { Dayjs } from 'dayjs';
 import type { UploadFile } from 'antd/es/upload/interface';
+import axios from 'axios';
+import type React from 'react';
 
-interface CreateHotelResponse {
+// 酒店类型定义
+export interface HotelItem {
+  id: number;
+  key?: React.Key;
+  name: string;
+  status: 'pending' | 'approved' | 'rejected' | 'published' | 'unpublished';
+  createdAt: string;
+  updatedAt: string;
+  address?: string;
+  auditComment?: string | null;
+  description?: string;
+  isDeleted?: number;
+  merchantId?: number;
+  openingDate?: string;
+  rating?: string;
+  star?: number;
+  starRating?: number;
+  roomType?: string;
+  price?: number;
+}
+
+// 创建酒店响应类型
+export interface CreateHotelResponse {
+  code: number;
+  message?: string;
+  data?: {
+    id: number;
+    name?: string;
+    address?: string;
+    description?: string;
+    star?: number;
+    openingDate?: string;
+    merchantId?: number;
+    status?: 'pending' | 'approved' | 'rejected' | 'published' | 'unpublished' | string;
+    createdAt?: string;
+    updatedAt?: string;
+  };
+}
+
+// 酒店详情类型定义
+export interface HotelDetail {
+  id: number;
+  name: string;
+  address: string;
+  description: string;
+  star: number;
+  rating: number;
+  openingDate: string;
+  merchantId: number;
+  status: 'pending' | 'approved' | 'rejected' | 'published' | 'unpublished';
+  auditComment: string;
+  images: Array<{
+    id: number;
+    url: string;
+    type: string;
+  }>;
+  tags: string[];
+  rooms: Array<{
+    id: number;
+    type: string;
+    area: number;
+    bedType: string;
+    maxOccupancy: number;
+    price: number;
+    totalRooms: number;
+    available: number;
+    images: string[];
+    amenities: string[];
+  }>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// 酒店列表响应
+export interface HotelResponse {
   code: number;
   data: {
-    id: number;
-    status: string;
-    createdAt: string;
+    total: number;
+    page: number;
+    pageSize: number;
+    items: HotelItem[];
   };
 }
 
@@ -50,23 +127,196 @@ export const createHotelWithFiles = async (
   });
 
   // 发送请求
-  const response = await fetch('/api/merchant/hotels/upload', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      // 注意：不要设置 Content-Type，让浏览器自动设置
-    },
-    body: formData
-  });
+  try {
+    const response = await fetch('/api/merchant/hotels/upload', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        // 注意：不要设置 Content-Type，让浏览器自动设置
+      },
+      body: formData
+    });
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    if (!response.ok) {
+      // 尝试获取错误信息
+      try {
+        const errorData = await response.json();
+        throw new Error(`创建酒店失败: ${errorData.message || `状态码 ${response.status}`}`);
+      } catch (jsonError) {
+        throw new Error(`创建酒店失败: 状态码 ${response.status}`);
+      }
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error: any) {
+    console.error('创建酒店请求失败:', error);
+    throw new Error(`创建酒店失败: ${error.message || '未知错误'}`);
   }
-
-  return await response.json();
 };
 
-// export default {
-//   createHotel,
-//   prepareHotelData
-// };
+// 获取酒店列表
+export const getHotelList = async (params: {
+  page: number;
+  pageSize: number;
+  status?: string;
+  searchKeyword?: string;
+}): Promise<{
+  items: HotelItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}> => {
+  const token = localStorage.getItem('token');
+  // 构建实际的查询参数，只包含后端需要的字段
+  const apiParams: any = {
+    page: params.page,
+    pageSize: params.pageSize,
+  };
+  
+  // 只添加后端支持的参数
+  if (params.status) {
+    apiParams.status = params.status;
+  }
+  
+  try {
+    const response = await axios.get<HotelResponse>('/api/merchant/hotels', {
+      params: apiParams,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    // console.log('API Response:', response.data);
+    if (response.data.code === 200) {
+      const { total, page, pageSize, items } = response.data.data;
+      
+      // 格式化数据，添加key属性并转换字段名
+      const formattedItems = items.map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        status: item.status,
+        createdAt: item.created_at,
+        updatedAt: item.updated_at,
+        address: item.address,
+        auditComment: item.audit_comment,
+        description: item.description,
+        isDeleted: item.is_deleted,
+        merchantId: item.merchant_id,
+        openingDate: item.opening_date,
+        rating: item.rating,
+        star: item.star,
+        starRating: item.star, // 将 star 映射到 starRating 以保持一致性
+        key: item.id,
+      }));
+      
+      return {
+        items: formattedItems,
+        total,
+        page,
+        pageSize,
+      };
+    } else {
+      throw new Error('获取数据失败: 未知错误');
+    }
+  } catch (error: any) {
+    console.error('获取酒店数据失败:', error);
+    console.error('错误详情:', error.response?.data);
+    throw new Error(`网络请求失败: ${error.message || '未知错误'}`);
+  }
+};
+
+// 删除酒店
+export const deleteHotel = async (hotelId: number): Promise<{ code: number; message: string }> => {
+  const token = localStorage.getItem('token');
+  const response = await axios.delete<{ code: number; message: string }>(
+    `/api/merchant/hotels/${hotelId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+// 获取酒店详情
+export const getHotelDetail = async (hotelId: number): Promise<HotelDetail> => {
+  const token = localStorage.getItem('token');
+  const response = await axios.get<{ code: number; data: HotelDetail }>(
+    `/api/merchant/hotels/${hotelId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  
+  if (response.data.code === 200) {
+    return response.data.data;
+  } else {
+    throw new Error('获取酒店详情失败');
+  }
+};
+
+// 更新酒店信息
+export const updateHotelInfo = async (hotelId: number, data: Partial<HotelDetail>): Promise<{ code: number; message: string }> => {
+  const token = localStorage.getItem('token');
+  const response = await axios.put<{ code: number; message: string }>(
+    `/api/merchant/hotels/${hotelId}`,
+    data,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+  return response.data;
+};
+
+// 添加房型
+export const addRoom = async (hotelId: number, formData: FormData): Promise<{ code: number; message: string; data?: any }> => {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await fetch(`/api/merchant/hotels/${hotelId}/rooms/upload`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        // 注意：不要设置 Content-Type，让浏览器自动设置
+      },
+      body: formData
+    });
+    
+    if (!response.ok) {
+      // 尝试获取错误信息
+      try {
+        const errorData = await response.json();
+        throw new Error(`添加房型失败: ${errorData.message || `状态码 ${response.status}`}`);
+      } catch (jsonError) {
+        throw new Error(`添加房型失败: 状态码 ${response.status}`);
+      }
+    }
+    
+    const result = await response.json();
+    return result;
+  } catch (error: any) {
+    console.error('添加房型请求失败:', error);
+    throw new Error(`添加房型失败: ${error.message || '未知错误'}`);
+  }
+};
+
+// 发布酒店
+export const publishHotel = async (hotelId: number): Promise<{ code: number; message: string }> => {
+  const token = localStorage.getItem('token');
+  const response = await axios.post<{ code: number; message: string }>(
+    `/api/merchant/hotels/${hotelId}/publish`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Form, Input, message } from 'antd';
+import { Button, Form, Input, message, Alert } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import Register from '../../components/Register';
 import { login } from '../../services/authService';
@@ -24,11 +24,25 @@ const App: React.FC = () => {
         message.success('登录成功');
         // 根据用户角色跳转到不同页面
         if (response.data?.user.role === 'admin') {
-          navigate('/admin');
+          navigate('/admin/showHotel');
         } else if (response.data?.user.role === 'merchant') {
-          navigate('/merchant');
+          navigate('/merchant/MerchantHome');
+        } else if (response.data?.user.role === 'user') {
+          <Alert
+            title="Warning"
+            description="本系统不用于用户登录，仅管理员和商户登录"
+            type="warning"
+            showIcon
+            closable
+          />
         } else {
-          navigate('/');
+          <Alert
+            title="Error"
+            description="登录失败，请联系管理员"
+            type="error"
+            showIcon
+          />
+          navigate('/login');
         }
       } else {
         message.error(response.message || '登录失败');

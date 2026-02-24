@@ -1,18 +1,50 @@
 // ...existing code...
 import React, { useState, useEffect } from 'react';
-import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, MailOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Menu } from 'antd';
+import { Menu, Button, message } from 'antd';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import logo from '../../common/image/Logo.png';
+import { logout } from '../../services/authService';
 
 
 type MenuItem = Required<MenuProps>['items'][number];
 
-const items: MenuItem[] = [
+// 退出登录处理函数
+const handleLogout = async () => {
+  try {
+    // 调用退出登录 API
+    await logout();
+  } catch (error) {
+    console.error('退出登录失败:', error);
+  } finally {
+    // 清除本地存储中的 token
+    localStorage.removeItem('token');
+    // 导航到登录页面
+    window.location.href = '/Welcome';
+  }
+};
+
+
+
+const App: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [current, setCurrent] = useState<string>(location.pathname || 'test');
+
+  useEffect(() => {
+    setCurrent(location.pathname);
+  }, [location.pathname]);
+
+  // 检查当前路径是否是酒店详情页面
+  const isHotelDetailPage = location.pathname.startsWith('/merchant/HotelDetail/');
+
+  // 动态生成菜单项
+  const items: MenuItem[] = [
     {
         label: (
             <img
-                src="https://ts3.tc.mm.bing.net/th/id/OIP-C.2d5X7HBz2EsEQIIxmwf92AHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"
+                src={logo}
                 alt="Logo"
                 style={{ height: 60, verticalAlign: 'middle' }}
             />
@@ -32,25 +64,36 @@ const items: MenuItem[] = [
         icon: <SettingOutlined />,
     },
     {
-        label: '房型管理',
-        key: '/merchant/RoomManage',
+        label: '酒店详情',
+        key: '/merchant/HotelDetail',
         icon: <SettingOutlined />,
+        disabled: true, 
     },
     {
         label: '消息通知',
         key: '/merchant/Notice',
         icon: <SettingOutlined />,
     },
+    {
+        label: (
+            <Button
+                style={{height:"55px"}}
+                type="text"
+                danger
+                icon={<LogoutOutlined />}
+                onClick={(e) => {
+                    e.preventDefault();
+                    handleLogout();
+                }}
+            >
+                退出登录
+            </Button>
+        ),
+        key: '/welcome',
+        style: { marginLeft: 'auto' },
+    },
 ];
 
-const App: React.FC = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [current, setCurrent] = useState<string>(location.pathname || 'test');
-
-  useEffect(() => {
-    setCurrent(location.pathname);
-  }, [location.pathname]);
 
   const onClick: MenuProps['onClick'] = (e) => {
     const path = String(e.key);
@@ -65,7 +108,7 @@ const App: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width:'100vw' }}>
             <Menu 
                 onClick={onClick} 
-                selectedKeys={[current]} 
+                selectedKeys={[isHotelDetailPage ? '/merchant/HotelDetail' : current]} 
                 mode="horizontal" 
                 items={items}
                 style={{ width: '100%', height:'60px', fontSize:'20px', paddingTop:'5px', marginBottom:'10px' }}

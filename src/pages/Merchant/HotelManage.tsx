@@ -1,9 +1,9 @@
-import { Table, Select, Space, Input, Button, message, Tag } from 'antd';
+import { Table, Space, Input, Button, message, Tag, Popconfirm } from 'antd';
 import type { ColumnsType, TableProps } from 'antd/es/table';
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import NewHotel from '../../components/NewHotel';
-import axios from 'axios'; 
-const { Option } = Select;
+import { deleteHotel, getHotelList, publishHotel } from '../../services/hotelService';
 const { Search } = Input;
 
 
@@ -20,18 +20,9 @@ interface HotelItem {
   price?: number;
 }
 
-interface HotelResponse {
-  code: number;
-  data: {
-    total: number;
-    page: number;
-    pageSize: number;
-    items: HotelItem[];
-  };
-}
-
 const HotelTable: React.FC = () => {
   // 状态管理
+  const navigate = useNavigate();
   const [data, setData] = useState<HotelItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [pagination, setPagination] = useState({
@@ -67,43 +58,29 @@ const HotelTable: React.FC = () => {
     setLoading(true);
     try {
       // 构建查询参数
-      const params: any = {
+      const params = {
         page: pagination.current,
         pageSize: pagination.pageSize,
+        status: filters.status,
+        searchKeyword: filters.searchKeyword,
       };
-      
-      // 添加状态过滤条件
-      if (filters.status) {
-        params.status = filters.status;
-      }
 
       // 调用API
-      const response = await axios.get<HotelResponse>('/merchant/hotels', {
-        params,
-      });
+      const result = await getHotelList(params);
 
-      if (response.data.code === 200) {
-        const { total, page, pageSize, items } = response.data.data;
-        
-        // 格式化数据，添加key属性
-        const formattedItems = items.map(item => ({
-          ...item,
-          key: item.id,
-        }));
-        
-        setData(formattedItems);
-        setPagination(prev => ({
-          ...prev,
-          total,
-          current: page,
-          pageSize,
-        }));
-      } else {
-        message.error('获取数据失败');
-      }
-    } catch (error) {
-      console.error('获取酒店数据失败:', error);
-      message.error('网络请求失败');
+      // 直接使用处理后的数据
+      setData(result.items.map(item => ({
+        ...item,
+        key: item.key ?? item.id, // 保证 key 不为 undefined
+      })));
+      setPagination(prev => ({
+        ...prev,
+        total: result.total,
+        current: result.page,
+        pageSize: result.pageSize,
+      }));
+    } catch (error: any) {
+      message.error(error.message || '获取数据失败');
     } finally {
       setLoading(false);
     }
@@ -120,6 +97,9 @@ const HotelTable: React.FC = () => {
     {
       title: '酒店名称',
       dataIndex: 'name',
+      ellipsis: true,
+      // 不设置固定宽度，让列自适应页面宽度
+      minWidth: 150,
       filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
         <div style={{ padding: 8 }}>
           <Search
@@ -130,7 +110,7 @@ const HotelTable: React.FC = () => {
               confirm();
               setFilters(prev => ({ ...prev, searchKeyword: selectedKeys[0] as string }));
             }}
-            style={{ width: 188, marginBottom: 8, display: 'block' }}
+            style={{ width: 150, marginBottom: 8, display: 'block' }}
           />
           <Space>
             <Button
@@ -213,7 +193,7 @@ const HotelTable: React.FC = () => {
     },
     {
       title: '操作',
-      width: 150,
+      width: 200,
       render: (_, record) => (
         <Space>
           <Button type="link" size="small" onClick={() => handleView(record)}>
@@ -222,6 +202,17 @@ const HotelTable: React.FC = () => {
           <Button type="link" size="small" onClick={() => handleEdit(record)}>
             编辑
           </Button>
+          <Popconfirm
+            title="确认删除吗？"
+            description="确认删除酒店吗？"
+            onConfirm={() => handleDelete(record)}
+            okText="确定"
+            cancelText="取消"
+          >
+            <Button danger type="link" size="small">
+              删除
+            </Button>
+          </Popconfirm>
           {record.status === 'approved' && (
             <Button type="link" size="small" onClick={() => handlePublish(record)}>
               发布
@@ -235,7 +226,20 @@ const HotelTable: React.FC = () => {
   // 操作处理函数
   const handleView = (record: HotelItem) => {
     console.log('查看酒店:', record);
-    // 跳转到查看页面或打开查看模态框
+    // 跳转到酒店详情页面
+    navigate(`/merchant/HotelDetail/${record.id}`);
+  };
+
+  const handleDelete = async (record: HotelItem) => {
+    try {
+      const response = await deleteHotel(record.id);
+      message.success(response.message || '删除成功');
+      // 重新获取数据
+      fetchHotelData();
+    } catch (error) {
+      console.error('删除酒店失败:', error);
+      message.error('删除失败，请重试');
+    }
   };
 
   const handleEdit = (record: HotelItem) => {
@@ -243,14 +247,16 @@ const HotelTable: React.FC = () => {
     // 跳转到编辑页面
   };
 
-  const handlePublish = (record: HotelItem) => {
-    console.log('发布酒店:', record);
-    // 调用发布接口
-  };
-
-  // 状态过滤处理
-  const handleStatusFilter = (value: string) => {
-    setFilters(prev => ({ ...prev, status: value || undefined }));
+  const handlePublish = async (record: HotelItem) => {
+    try {
+      const response = await publishHotel(record.id);
+      message.success(response.message || '发布成功');
+      // 重新获取数据
+      fetchHotelData();
+    } catch (error) {
+      console.error('发布酒店失败:', error);
+      message.error('发布失败，请重试');
+    }
   };
 
   // 搜索处理
@@ -307,25 +313,19 @@ const HotelTable: React.FC = () => {
     fetchHotelData();
   }, [pagination.current, pagination.pageSize, filters.status, filters.searchKeyword]);
 
+  // 前端搜索过滤
+  const filteredData = data.filter(item => {
+    if (filters.searchKeyword) {
+      return item.name.toLowerCase().includes(filters.searchKeyword.toLowerCase());
+    }
+    return true;
+  });
+
   return (
     <div style={{ padding: 24 }}>
       {/* 过滤工具栏 */}
       <div style={{ marginBottom: 16 }}>
         <Space wrap>
-          <Select
-            placeholder="选择状态"
-            allowClear
-            style={{ width: 120 }}
-            value={filters.status}
-            onChange={handleStatusFilter}
-          >
-            <Option value="pending">审核中</Option>
-            <Option value="approved">已通过</Option>
-            <Option value="rejected">已驳回</Option>
-            <Option value="published">已发布</Option>
-            <Option value="unpublished">未发布</Option>
-          </Select>
-
           <Search
             placeholder="搜索酒店名称"
             allowClear
@@ -344,7 +344,7 @@ const HotelTable: React.FC = () => {
       {/* 酒店表格 */}
       <Table<HotelItem>
         columns={columns}
-        dataSource={data}
+        dataSource={filteredData}
         onChange={onChange}
         pagination={paginationConfig}
         loading={loading}

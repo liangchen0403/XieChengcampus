@@ -1,10 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form, Input, Select, DatePicker, InputNumber, message, Upload, Space } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import type { FormInstance } from 'antd/es/form';
 import type { Dayjs } from 'dayjs';
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
 import { createHotelWithFiles } from '../../services/hotelService';
+import axios from 'axios';
+
+interface Tag {
+  id: number;
+  name: string;
+  category: string;
+}
+
+interface TagsResponse {
+  code: number;
+  data: Tag[];
+}
 
 interface HotelFormValues {
   name: string;
@@ -12,7 +23,7 @@ interface HotelFormValues {
   description?: string;
   star?: number;
   openingDate: Dayjs;
-  tagIds?: string;
+  tagIds?: string[];
   images: UploadFile[];
 }
 
@@ -20,6 +31,8 @@ const App: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = Form.useForm<HotelFormValues>();
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [tagsLoading, setTagsLoading] = useState(false);
 
   const showModal = () => {
     setOpen(true);
@@ -29,6 +42,57 @@ const App: React.FC = () => {
     setOpen(false);
     form.resetFields();
   };
+
+  // 获取标签列表
+  const fetchTags = async () => {
+    setTagsLoading(true);
+    try {
+      const response = await axios.get<TagsResponse>('/api/tags');
+      if (response.data.code === 200) {
+        setTags(response.data.data);
+      } else {
+        message.error('获取标签列表失败');
+      }
+    } catch (error) {
+      console.error('获取标签列表失败:', error);
+      message.error('网络请求失败');
+    } finally {
+      setTagsLoading(false);
+    }
+  };
+
+  // 新增标签
+  const handleCreateTag = async (name: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post<TagsResponse>('/api/tags', {
+        name,
+        category: 'theme' // 默认分类，可根据实际需求调整
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (response.data.code === 200) {
+        // 重新获取标签列表
+        fetchTags();
+        message.success('标签创建成功');
+      } else {
+        message.error('标签创建失败');
+      }
+    } catch (error) {
+      console.error('创建标签失败:', error);
+      message.error('网络请求失败');
+    }
+  };
+
+  // 当模态框打开时获取标签列表
+  useEffect(() => {
+    if (open) {
+      fetchTags();
+    }
+  }, [open]);
 
   const normFile = (e: any) => {
     if (Array.isArray(e)) {
@@ -40,6 +104,9 @@ const App: React.FC = () => {
   const handleSubmit = async (values: HotelFormValues) => {
     setConfirmLoading(true);
     try {
+      // 将标签数组转换为字符串，以便与后端接口兼容
+      const tagIdsString = values.tagIds?.join(',') || undefined;
+      
       // 发送请求
       const result = await createHotelWithFiles(
         values.name,
@@ -47,7 +114,7 @@ const App: React.FC = () => {
         values.description,
         values.star,
         values.openingDate,
-        values.tagIds,
+        tagIdsString,
         values.images
       );
 
@@ -138,7 +205,17 @@ const App: React.FC = () => {
             name="tagIds"
             label="酒店标签"
           >
-            <Select placeholder="请选择酒店标签" />
+            <Select
+              mode="multiple"
+              loading={tagsLoading}
+              style={{ width: '100%' }}
+              placeholder="请选择酒店标签"
+              options={tags.map(tag => ({
+                value: tag.name,
+                label: tag.name
+              }))}
+              tokenSeparators={[',']}
+            />
           </Form.Item>
           <Form.Item
             name="images"

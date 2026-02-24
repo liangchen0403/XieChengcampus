@@ -7,13 +7,15 @@ import Login from '../pages/Login'
 
 import MerchantHome from '../pages/Merchant/MerchantHome'
 import HotelManage from '../pages/Merchant/HotelManage'
-import RoomManage from '../pages/Merchant/RoomManage'
 import Notice from '../pages/Merchant/Notice'
+import HotelDetail from '../pages/Merchant/HotelDetail'
 
+import Admin from '../pages/Admin/admin'
+import ShowHotel from '../pages/Admin/ShowHotel'
+import PendHotel from '../pages/Admin/pendHotel'
+import PublishHotel from '../pages/Admin/publishHotel'
 
-const Register = lazy(() => import('../pages/Register'));
 const MerchantDashboard = lazy(() => import('../pages/Merchant/Merchant'));
-const AdminPanel = lazy(() => import('../pages/AdminPanel'));
 
 export interface RouteConfig {
 	path: string;
@@ -38,14 +40,14 @@ export const routes: RouteConfig[] = [
 			</Suspense>
 		),
 	},
-	{
-		path: '/register',
-		element: (
-			<Suspense fallback={<div>加载中...</div>}>
-				<Register />
-			</Suspense>
-		),
-	},
+	// {
+	// 	path: '/register',
+	// 	element: (
+	// 		<Suspense fallback={<div>加载中...</div>}>
+	// 			<Register />
+	// 		</Suspense>
+	// 	),
+	// },
 	{
 		path: '/merchant',
 		element: (
@@ -63,21 +65,33 @@ export const routes: RouteConfig[] = [
 				element:<HotelManage/>
 			},
 			{
-				path:'RoomManage',
-				element:<RoomManage/>
-			},
-			{
 				path:'Notice',
 				element:<Notice/>
+			},
+			{
+				path:'HotelDetail/:id',
+				element:<HotelDetail/>
 			},
 		]
 	},
 	{
 		path: '/admin',
 		element: (
-			<Suspense fallback={<div>加载中...</div>}>
-				<AdminPanel />
-			</Suspense>
+			<Admin />
 		),
+		children:[
+			{
+				path:'showHotel',
+				element:<ShowHotel/>
+			},
+			{
+				path:'pendHotel',
+				element:<PendHotel/>
+			},
+			{
+				path:'publishHotel',
+				element:<PublishHotel/>
+			},
+		]
 	},
 ];
