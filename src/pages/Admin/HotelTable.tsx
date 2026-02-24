@@ -1,9 +1,10 @@
-import React from 'react';
-import { Table, Tag, Flex } from 'antd';
+import React, { useState } from 'react';
+import { Table, Tag, Flex, Button, Modal, Image, Carousel } from 'antd';
 import type { TableProps } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { createStaticStyles } from 'antd-style';
 import type { AdminHotel } from '../../services/hotelService';
+import { EyeOutlined } from '@ant-design/icons';
 
 const classNames = createStaticStyles(({ css }) => ({
   root: css`
@@ -189,7 +190,35 @@ const columns: ColumnsType<AdminHotel> = [
       return new Date(updatedAt).toLocaleString();
     },
   },
+  {
+    title: '查看图片',
+    key: 'viewImages',
+    width: 100,
+    render: (_: any, hotel: AdminHotel) => {
+      return (
+        <Button 
+          type="link" 
+          icon={<EyeOutlined />}
+          onClick={() => {
+            // 触发查看图片的回调
+            if (typeof window !== 'undefined' && window.viewHotelImages) {
+              window.viewHotelImages(hotel);
+            }
+          }}
+        >
+          查看
+        </Button>
+      );
+    },
+  },
 ];
+
+// 扩展全局对象类型
+declare global {
+  interface Window {
+    viewHotelImages?: (hotel: AdminHotel) => void;
+  }
+}
 
 interface HotelTableProps {
   hotels: AdminHotel[];
@@ -200,6 +229,13 @@ interface HotelTableProps {
   onPaginationChange: (current: number, size: number) => void;
   title?: string;
   customColumns?: ColumnsType<AdminHotel>;
+  // 过滤参数
+  filters?: {
+    status?: string;
+    auditStatus?: string;
+    merchantId?: string;
+    searchKeyword?: string;
+  };
 }
 
 const HotelTable: React.FC<HotelTableProps> = ({
@@ -211,7 +247,52 @@ const HotelTable: React.FC<HotelTableProps> = ({
   onPaginationChange,
   title = '酒店总览',
   customColumns = [],
+  filters = {},
 }) => {
+  // 根据过滤参数处理数据
+  const filteredHotels = hotels.filter(hotel => {
+    // 状态过滤
+    if (filters.status && hotel.status !== filters.status) {
+      return false;
+    }
+    
+    // 审核状态过滤
+    if (filters.auditStatus && hotel.auditStatus !== filters.auditStatus) {
+      return false;
+    }
+    
+    // 商户ID过滤
+    if (filters.merchantId && hotel.merchant.id.toString() !== filters.merchantId) {
+      return false;
+    }
+    
+    // 关键词搜索
+    if (filters.searchKeyword) {
+      const keyword = filters.searchKeyword.toLowerCase();
+      return (
+        hotel.name.toLowerCase().includes(keyword) ||
+        hotel.address.toLowerCase().includes(keyword) ||
+        hotel.merchant.username.toLowerCase().includes(keyword)
+      );
+    }
+    
+    return true;
+  });
+  // 状态管理
+  const [imageModalVisible, setImageModalVisible] = useState(false);
+  const [currentHotel, setCurrentHotel] = useState<AdminHotel | null>(null);
+  
+  // 处理查看图片
+  const handleViewImages = (hotel: AdminHotel) => {
+    setCurrentHotel(hotel);
+    setImageModalVisible(true);
+  };
+  
+  // 在全局对象上挂载查看图片的方法，以便在 render 函数中调用
+  if (typeof window !== 'undefined' && !window.viewHotelImages) {
+    window.viewHotelImages = handleViewImages;
+  }
+  
   // Combine default columns with custom columns
   const combinedColumns = [...columns, ...customColumns];
 
@@ -219,7 +300,7 @@ const HotelTable: React.FC<HotelTableProps> = ({
     <Flex vertical gap="middle">
       <Table
         loading={loading}
-        dataSource={hotels}
+        dataSource={filteredHotels}
         columns={combinedColumns}
         rowKey="id"
         classNames={classNames}
@@ -228,7 +309,7 @@ const HotelTable: React.FC<HotelTableProps> = ({
         pagination={{
           current: page,
           pageSize: pageSize,
-          total: total,
+          total: filteredHotels.length,
           onChange: onPaginationChange,
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '50'],
@@ -236,11 +317,35 @@ const HotelTable: React.FC<HotelTableProps> = ({
           showQuickJumper: true,
         }}
         scroll={{
-          x: 1600, // Increased width to accommodate action column
+          x: 1700, // Increased width to accommodate view images column
           y: 600, // 设置最大高度，确保表格有纵向滚动条
         }}
         size="middle"
       />
+      
+      {/* 图片查看弹窗 */}
+      <Modal
+        title={currentHotel?.name || '酒店图片'}
+        open={imageModalVisible}
+        onCancel={() => setImageModalVisible(false)}
+        footer={null}
+        width={800}
+      >
+        {currentHotel?.coverImage ? (
+          <div style={{ textAlign: 'center' }}>
+            <Image
+              src={currentHotel.coverImage}
+              alt={currentHotel.name}
+              style={{ maxWidth: '100%', maxHeight: '500px' }}
+            />
+            <p style={{ marginTop: 16, color: '#666' }}>酒店封面图片</p>
+          </div>
+        ) : (
+          <div style={{ textAlign: 'center', padding: '40px 0', color: '#999' }}>
+            暂无图片
+          </div>
+        )}
+      </Modal>
     </Flex>
   );
 };

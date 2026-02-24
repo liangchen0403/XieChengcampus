@@ -213,11 +213,6 @@ const HotelTable: React.FC = () => {
               删除
             </Button>
           </Popconfirm>
-          {record.status === 'approved' && (
-            <Button type="link" size="small" onClick={() => handlePublish(record)}>
-              发布
-            </Button>
-          )}
         </Space>
       ),
     },
@@ -245,18 +240,6 @@ const HotelTable: React.FC = () => {
   const handleEdit = (record: HotelItem) => {
     console.log('编辑酒店:', record);
     // 跳转到编辑页面
-  };
-
-  const handlePublish = async (record: HotelItem) => {
-    try {
-      const response = await publishHotel(record.id);
-      message.success(response.message || '发布成功');
-      // 重新获取数据
-      fetchHotelData();
-    } catch (error) {
-      console.error('发布酒店失败:', error);
-      message.error('发布失败，请重试');
-    }
   };
 
   // 搜索处理

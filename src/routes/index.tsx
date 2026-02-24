@@ -13,7 +13,7 @@ import HotelDetail from '../pages/Merchant/HotelDetail'
 import Admin from '../pages/Admin/admin'
 import ShowHotel from '../pages/Admin/ShowHotel'
 import PendHotel from '../pages/Admin/pendHotel'
-import PublishHotel from '../pages/Admin/publishHotel'
+import PublishHotel from '../pages/Admin/PublishHotel'
 
 const MerchantDashboard = lazy(() => import('../pages/Merchant/Merchant'));
 

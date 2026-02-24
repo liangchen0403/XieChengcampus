@@ -306,21 +306,6 @@ export const addRoom = async (hotelId: number, formData: FormData): Promise<{ co
   }
 };
 
-// 下线酒店
-export const publishHotel = async (hotelId: number): Promise<{ code: number; message: string }> => {
-  const token = localStorage.getItem('token');
-  const response = await axios.post<{ code: number; message: string }>(
-    `/api/merchant/hotels/${hotelId}/publish`,
-    {},
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return response.data;
-};
-
 // 管理员获取酒店列表
 export interface AdminHotel {
   id: number;
@@ -354,7 +339,7 @@ export interface AdminHotelResponse {
 }
 
 export const getAdminHotelList = async (
-  page: number = 2,
+  page: number = 1,
   pageSize: number = 10,
   status: string = '',
   merchantId: string = ''
@@ -396,21 +381,83 @@ export const auditHotel = async (
   auditData: AuditHotelRequest
 ): Promise<AuditHotelResponse> => {
   const token = localStorage.getItem('token');
-  const response = await axios.post<AuditHotelResponse>(
-    `/api/admin/hotels/${hotelId}/audit`,
+  console.log('审核酒店请求:', {
+    hotelId,
     auditData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+    token: token ? '存在' : '不存在',
+    url: `/api/admin/hotels/${hotelId}/audit`
+  });
+  try {
+    const response = await axios.post<AuditHotelResponse>(
+      `/api/admin/hotels/${hotelId}/audit`,
+      auditData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    
+    console.log('审核酒店响应:', response.data);
+    if (response.data.code === 200) {
+      console.log('审核酒店成功:', response.data);
+      return response.data;
+    } else {
+      throw new Error('审核酒店失败');
     }
-  );
-  
-  if (response.data.code === 200) {
-    console.log('审核酒店成功:', response.data);
-    return response.data;
-  } else {
-    throw new Error('审核酒店失败');
+  } catch (error: any) {
+    console.error('审核酒店错误:', error);
+    console.error('错误响应:', error.response);
+    throw error;
+  }
+};
+
+// 发布/下线酒店
+
+export interface PublishHotelRequest {
+  action: 'publish' | 'unpublish';
+}
+export interface PublishHotelResponse {
+  code: number;
+  data: {
+    id: number;
+    status: 'published' | 'unpublished';
+  };
+}
+export const publishHotel = async (
+  hotelId: number,
+  action: 'publish' | 'unpublish'
+): Promise<PublishHotelResponse['data']> => {
+  const token = localStorage.getItem('token');
+  console.log('发布酒店请求:', {
+    hotelId,
+    action,
+    token: token ? '存在' : '不存在',
+    url: `/api/admin/hotels/${hotelId}/publish`
+  });
+  try {
+    const response = await axios.post<PublishHotelResponse>(
+      `/api/admin/hotels/${hotelId}/publish`,
+      { action },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    
+    console.log('发布酒店响应:', response.data);
+    if (response.data.code === 200) {
+      console.log('发布酒店成功:', response.data.data);
+      return response.data.data;
+    } else {
+      throw new Error('发布酒店失败');
+    }
+  } catch (error: any) {
+    console.error('发布酒店错误:', error);
+    console.error('错误响应:', error.response);
+    throw error;
   }
 };

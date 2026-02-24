@@ -109,6 +109,9 @@ export default function pendHotel() {
         pageSize={pageSize}
         onPaginationChange={handlePaginationChange}
         title="待审核酒店"
+        filters={{
+          status: 'pending',
+        }}
         customColumns={actionColumn}
       />
       
