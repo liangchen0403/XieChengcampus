@@ -1,0 +1,70 @@
+.loginContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.loginBox {
+  width: 100%;
+  max-width: 400px;
+  background: white;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.loginTitle {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #1890ff;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.loginForm {
+  width: 100%;
+}
+
+.inputIcon {
+  color: #1890ff;
+}
+
+.rememberForgot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rememberMe {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.forgotPassword {
+  font-size: 14px;
+  color: #1890ff;
+  text-decoration: none;
+}
+
+.forgotPassword:hover {
+  text-decoration: underline;
+}
+
+.loginButton {
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.registerLink {
+  text-align: center;
+  margin-top: 16px;
+  color: #666;
+}

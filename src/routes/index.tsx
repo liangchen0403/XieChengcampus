@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import {Navigate} from 'react-router-dom'
 
 import Welcome from '../pages/Welcome/Welcome'
-import Login from '../components/Login/Login'
+import Login from '../pages/Login'
 
 import MerchantHome from '../pages/Merchant/MerchantHome'
 import HotelManage from '../pages/Merchant/HotelManage'
