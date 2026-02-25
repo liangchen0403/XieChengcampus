@@ -14,12 +14,12 @@ export default function PublishHotelPage() {
 
   // 获取待发布酒店列表
   const fetchHotels = async () => {
-    console.log('获取待发布酒店列表:', { page, pageSize });
+    //console.log('获取待发布酒店列表:', { page, pageSize });
     setLoading(true);
     try {
       // 获取所有酒店（包括已发布和未发布的）
       const result = await getAdminHotelList(page, pageSize);
-      console.log('获取待发布酒店列表成功:', { total: result.total, itemsCount: result.items.length });
+      //console.log('获取待发布酒店列表成功:', { total: result.total, itemsCount: result.items.length });
       setHotels(result.items);
       setTotal(result.total);
     } catch (error: any) {
@@ -32,7 +32,7 @@ export default function PublishHotelPage() {
 
   // 处理分页变化
   const handlePaginationChange = (current: number, size?: number) => {
-    console.log('分页变化:', { current, size });
+    //console.log('分页变化:', { current, size });
     setPage(current);
     if (size !== undefined) {
       setPageSize(size);

@@ -90,16 +90,16 @@ const AddRoom: React.FC<AddRoomProps> = ({ hotelId, open, onClose, onSuccess }) 
       }
       
       // 输出请求体内容
-      console.log('=== 请求体内容 ===');
-      console.log('文本字段:');
+      //console.log('=== 请求体内容 ===');
+      //console.log('文本字段:');
       formData.forEach((value, key) => {
         if (typeof value === 'string') {
-          console.log(`${key}: ${value}`);
+          //console.log(`${key}: ${value}`);
         } else if (value instanceof Blob) {
-          console.log(`${key}: 文件 (${value.type}, ${(value.size / 1024).toFixed(2)}KB)`);
+          //console.log(`${key}: 文件 (${value.type}, ${(value.size / 1024).toFixed(2)}KB)`);
         }
       });
-      console.log('==================');
+      //console.log('==================');
       
       // 调用 API
       const result = await addRoom(hotelId, formData);

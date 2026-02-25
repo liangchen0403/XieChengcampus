@@ -122,7 +122,7 @@ export const createHotelWithFiles = async (
     tagIds.forEach(tagId => {
       formData.append('tagIds', tagId.toString());
     });
-    console.log(formData);
+    //console.log(formData);
   }
   
   // 添加文件
@@ -193,7 +193,7 @@ export const getHotelList = async (params: {
       },
     });
 
-    // console.log('API Response:', response.data);
+    // //console.log('API Response:', response.data);
     if (response.data.code === 200) {
       const { total, page, pageSize, items } = response.data.data;
       
@@ -259,7 +259,7 @@ export const getHotelDetail = async (hotelId: number): Promise<HotelDetail> => {
   );
   
   if (response.data.code === 200) {
-    console.log('API Response:', response.data);
+    //console.log('API Response:', response.data);
     return response.data.data;
   } else {
     throw new Error('获取酒店详情失败');
@@ -440,7 +440,7 @@ export const getAdminHotelList = async (
   const token = localStorage.getItem('token');
   console.log('请求参数:', { page, pageSize, status, merchantId });
   const response = await axios.get<AdminHotelResponse>('/api/admin/hotels', {
-    params: {
+    data: {
       page,
       pageSize,
       status,
@@ -452,7 +452,7 @@ export const getAdminHotelList = async (
   });
   
   if (response.data.code === 200) {
-    // console.log('获取酒店列表成功:', response.data.data);
+    // //console.log('获取酒店列表成功:', response.data.data);
     return response.data.data;
   } else {
     throw new Error('获取酒店列表失败');
@@ -475,12 +475,12 @@ export const auditHotel = async (
   auditData: AuditHotelRequest
 ): Promise<AuditHotelResponse> => {
   const token = localStorage.getItem('token');
-  console.log('审核酒店请求:', {
+  /*console.log('审核酒店请求:', {
     hotelId,
     auditData,
     token: token ? '存在' : '不存在',
     url: `/api/admin/hotels/${hotelId}/audit`
-  });
+  });*/
   try {
     const response = await axios.post<AuditHotelResponse>(
       `/api/admin/hotels/${hotelId}/audit`,
@@ -493,9 +493,9 @@ export const auditHotel = async (
       }
     );
     
-    console.log('审核酒店响应:', response.data);
+    //console.log('审核酒店响应:', response.data);
     if (response.data.code === 200) {
-      console.log('审核酒店成功:', response.data);
+      //console.log('审核酒店成功:', response.data);
       return response.data;
     } else {
       throw new Error('审核酒店失败');
@@ -524,12 +524,12 @@ export const publishHotel = async (
   action: 'publish' | 'unpublish'
 ): Promise<PublishHotelResponse['data']> => {
   const token = localStorage.getItem('token');
-  console.log('发布酒店请求:', {
+  /*console.log('发布酒店请求:', {
     hotelId,
     action,
     token: token ? '存在' : '不存在',
     url: `/api/admin/hotels/${hotelId}/publish`
-  });
+  });*/
   try {
     const response = await axios.post<PublishHotelResponse>(
       `/api/admin/hotels/${hotelId}/publish`,
@@ -542,9 +542,9 @@ export const publishHotel = async (
       }
     );
     
-    console.log('发布酒店响应:', response.data);
+    //console.log('发布酒店响应:', response.data);
     if (response.data.code === 200) {
-      console.log('发布酒店成功:', response.data.data);
+      //console.log('发布酒店成功:', response.data.data);
       return response.data.data;
     } else {
       throw new Error('发布酒店失败');

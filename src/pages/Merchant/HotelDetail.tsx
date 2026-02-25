@@ -82,7 +82,7 @@ const HotelDetail: React.FC = () => {
         tagIds: tagIdsFromDetail,
         facilityIds: [] // 暂无设施数据源时保持空
       });
-      console.log(hotelDetail.tags);
+      //console.log(hotelDetail.tags);
     }
   }, [hotelDetail, editing, form, tags]);
 

@@ -15,12 +15,12 @@ const ShowHotel: React.FC = () => {
 
   // 获取酒店列表
   const fetchHotels = async () => {
-    console.log('获取酒店列表:', { page: pagination.current, pageSize: pagination.pageSize });
+    //console.log('获取酒店列表:', { page: pagination.current, pageSize: pagination.pageSize });
     setLoading(true);
     try {
       const result = await getAdminHotelList(pagination.current, pagination.pageSize);
-      console.log("---------------------------",pagination);
-      console.log('获取酒店列表成功:', { total: result.total, itemsCount: result.items.length });
+      //console.log("---------------------------",pagination);
+      //console.log('获取酒店列表成功:', { total: result.total, itemsCount: result.items.length });
       setHotels(result.items);
       setPagination(prev => ({
         ...prev,
@@ -34,23 +34,10 @@ const ShowHotel: React.FC = () => {
     }
   };
 
-  // 表格变化处理
-  const onChange: TableProps<AdminHotel>['onChange'] = (paginationInfo) => {
-    console.log('分页变化:', paginationInfo);
-    
-    // 更新分页信息
-    if (paginationInfo.current) {
-      setPagination(prev => ({
-        ...prev,
-        current: paginationInfo.current || 1,
-        pageSize: paginationInfo.pageSize || 10,
-      }));
-    }
-  };
 
   // 处理分页变化
   const handlePaginationChange = (current: number, size: number) => {
-    console.log('分页变化:', { current, size });
+    //console.log('分页变化:', { current, size });
     setPagination(prev => ({ ...prev, current, pageSize: size }));
   };
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Form, Input, message, Alert } from 'antd';
+import { Button, Form, Input, message, Alert, Checkbox } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import Register from '../../components/Register';
 import { login } from '../../services/authService';
@@ -57,32 +57,72 @@ const App: React.FC = () => {
 
   return (
     //登录表单
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-      <Form
-        name="login"
-        initialValues={{ remember: true }}
-        style={{ width: '100%', maxWidth: 360 }}
-        onFinish={onFinish}
-      >
-        <Form.Item
-          name="username"
-          rules={[{ required: true, message: 'Please input your Username!' }]}
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '16px',
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '400px',
+        background: 'white',
+        padding: '40px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
+      }}>
+        <h1 style={{
+          textAlign: 'center',
+          marginBottom: '30px',
+          color: '#1890ff',
+          fontSize: '24px',
+          fontWeight: '600'
+        }}>欢迎登录</h1>
+        <Form
+          name="login"
+          initialValues={{ remember: true }}
+          onFinish={onFinish}
         >
-          <Input prefix={<UserOutlined />} placeholder="Username" />
-        </Form.Item>
-        <Form.Item
-          name="password"
-          rules={[{ required: true, message: 'Please input your Password!' }]}
-        >
-          <Input prefix={<LockOutlined />} type="password" placeholder="Password" />
-        </Form.Item>
-        <Form.Item>
-          <Button block type="primary" htmlType="submit" loading={loading}>
-            Log in
-          </Button>
-          or <Register/>
-        </Form.Item>
-      </Form>
+          <Form.Item
+            name="username"
+            rules={[{ required: true, message: '请输入用户名!' }]}
+          >
+            <Input 
+              prefix={<UserOutlined style={{ color: '#1890ff' }} />} 
+              placeholder="用户名" 
+              size="large"
+            />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            rules={[{ required: true, message: '请输入密码!' }]}
+          >
+            <Input 
+              prefix={<LockOutlined style={{ color: '#1890ff' }} />} 
+              type="password" 
+              placeholder="密码" 
+              size="large"
+            />
+          </Form.Item>
+          <Form.Item style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          </Form.Item>
+          <Form.Item>
+            <Button 
+              block 
+              type="primary" 
+              htmlType="submit" 
+              loading={loading}
+              size="large"
+            >
+              登录
+            </Button>
+          </Form.Item>
+          <Form.Item style={{ textAlign: 'center', marginTop: '16px' }}>
+            还没有账号? <Register />
+          </Form.Item>
+        </Form>
+      </div>
     </div>
   );
 };

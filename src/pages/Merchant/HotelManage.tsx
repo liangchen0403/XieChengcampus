@@ -216,7 +216,7 @@ const HotelTable: React.FC = () => {
 
   // 操作处理函数
   const handleView = (record: HotelItem) => {
-    console.log('查看酒店:', record);
+    //console.log('查看酒店:', record);
     // 跳转到酒店详情页面
     navigate(`/merchant/HotelDetail/${record.id}`);
   };
@@ -248,7 +248,7 @@ const HotelTable: React.FC = () => {
 
   // 表格变化处理
   const onChange: TableProps<HotelItem>['onChange'] = (paginationInfo, filters, sorter, extra) => {
-    console.log('params', paginationInfo, filters, sorter, extra);
+    //console.log('params', paginationInfo, filters, sorter, extra);
     
     // 更新分页信息
     if (paginationInfo.current) {
