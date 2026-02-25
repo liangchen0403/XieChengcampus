@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Table, Tag, Flex, Button, Modal, Image, Carousel } from 'antd';
 import type { TableProps } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
@@ -190,35 +190,10 @@ const columns: ColumnsType<AdminHotel> = [
       return new Date(updatedAt).toLocaleString();
     },
   },
-  {
-    title: '查看图片',
-    key: 'viewImages',
-    width: 100,
-    render: (_: any, hotel: AdminHotel) => {
-      return (
-        <Button 
-          type="link" 
-          icon={<EyeOutlined />}
-          onClick={() => {
-            // 触发查看图片的回调
-            if (typeof window !== 'undefined' && window.viewHotelImages) {
-              window.viewHotelImages(hotel);
-            }
-          }}
-        >
-          查看
-        </Button>
-      );
-    },
-  },
+
 ];
 
-// 扩展全局对象类型
-declare global {
-  interface Window {
-    viewHotelImages?: (hotel: AdminHotel) => void;
-  }
-}
+
 
 interface HotelTableProps {
   hotels: AdminHotel[];
@@ -231,7 +206,7 @@ interface HotelTableProps {
   customColumns?: ColumnsType<AdminHotel>;
   // 过滤参数
   filters?: {
-    status?: string;
+    status?: string | string[];
     auditStatus?: string;
     merchantId?: string;
     searchKeyword?: string;
@@ -251,9 +226,17 @@ const HotelTable: React.FC<HotelTableProps> = ({
 }) => {
   // 根据过滤参数处理数据
   const filteredHotels = hotels.filter(hotel => {
-    // 状态过滤
-    if (filters.status && hotel.status !== filters.status) {
-      return false;
+    // 状态过滤 - 支持单个状态或状态数组
+    if (filters.status) {
+      if (Array.isArray(filters.status)) {
+        if (!filters.status.includes(hotel.status)) {
+          return false;
+        }
+      } else {
+        if (hotel.status !== filters.status) {
+          return false;
+        }
+      }
     }
     
     // 审核状态过滤
@@ -283,18 +266,35 @@ const HotelTable: React.FC<HotelTableProps> = ({
   const [currentHotel, setCurrentHotel] = useState<AdminHotel | null>(null);
   
   // 处理查看图片
-  const handleViewImages = (hotel: AdminHotel) => {
+  const handleViewImages = useCallback((hotel: AdminHotel) => {
     setCurrentHotel(hotel);
     setImageModalVisible(true);
-  };
+  }, []);
   
-  // 在全局对象上挂载查看图片的方法，以便在 render 函数中调用
-  if (typeof window !== 'undefined' && !window.viewHotelImages) {
-    window.viewHotelImages = handleViewImages;
-  }
-  
-  // Combine default columns with custom columns
-  const combinedColumns = [...columns, ...customColumns];
+  // Combine default columns with custom columns and add view images column
+  const combinedColumns = useMemo(() => {
+    // 添加查看图片列
+    const viewImagesColumn = {
+      title: '查看图片',
+      key: 'viewImages',
+      width: 100,
+      render: (_: any, hotel: AdminHotel) => {
+        return (
+          <Button 
+            type="link" 
+            icon={<EyeOutlined />}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleViewImages(hotel);
+            }}
+          >
+            查看
+          </Button>
+        );
+      },
+    };
+    return [...columns, viewImagesColumn, ...customColumns];
+  }, [customColumns, handleViewImages]);
 
   return (
     <Flex vertical gap="middle">
@@ -332,14 +332,28 @@ const HotelTable: React.FC<HotelTableProps> = ({
         width={800}
       >
         {currentHotel?.coverImage ? (
-          <div style={{ textAlign: 'center' }}>
-            <Image
-              src={currentHotel.coverImage}
-              alt={currentHotel.name}
-              style={{ maxWidth: '100%', maxHeight: '500px' }}
-            />
-            <p style={{ marginTop: 16, color: '#666' }}>酒店封面图片</p>
-          </div>
+          <Carousel autoplay={false} dots={true} style={{ maxHeight: '500px' }}>
+            <div>
+              <Image
+                src={currentHotel.coverImage}
+                alt={`${currentHotel.name} 封面图片`}
+                style={{ maxWidth: '100%', maxHeight: '500px' }}
+                preview={false}
+              />
+              <p style={{ textAlign: 'center', marginTop: 16, color: '#666' }}>酒店封面图片</p>
+            </div>
+            {currentHotel.images && currentHotel.images.map((image: string | undefined, index: number) => (
+              <div key={index}>
+                <Image
+                  src={image}
+                  alt={`${currentHotel.name} 图片 ${index + 1}`}
+                  style={{ maxWidth: '100%', maxHeight: '500px' }}
+                  preview={false}
+                />
+                <p style={{ textAlign: 'center', marginTop: 16, color: '#666' }}>图片 {index + 1}</p>
+              </div>
+            ))}
+          </Carousel>
         ) : (
           <div style={{ textAlign: 'center', padding: '40px 0', color: '#999' }}>
             暂无图片

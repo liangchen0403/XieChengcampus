@@ -1,6 +1,6 @@
 // ...existing code...
 import React, { useState, useEffect } from 'react';
-import { AppstoreOutlined, MailOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined, HomeOutlined, SettingOutlined, LogoutOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Menu, Button, message } from 'antd';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
@@ -56,7 +56,7 @@ const App: React.FC = () => {
     {
         label: '首页',
         key: '/merchant/MerchantHome',
-        icon: <MailOutlined />,
+        icon: <HomeOutlined />,
     },
     {
         label: '酒店管理',
@@ -66,13 +66,13 @@ const App: React.FC = () => {
     {
         label: '酒店详情',
         key: '/merchant/HotelDetail',
-        icon: <SettingOutlined />,
+        icon: <UnorderedListOutlined />,
         disabled: true, 
     },
     {
         label: '消息通知',
         key: '/merchant/Notice',
-        icon: <SettingOutlined />,
+        icon: <ExclamationCircleOutlined />
     },
     {
         label: (

@@ -1,44 +1,12 @@
 import React from 'react';
 import { Flex, Layout, Menu } from 'antd';
 import { Link, useLocation, Outlet } from 'react-router-dom';
-import { UserOutlined, HomeOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
+import { FileSearchOutlined,FileOutlined, FileProtectOutlined, LogoutOutlined } from '@ant-design/icons';
+import styles from './admin.module.css';
 
-const { Header, Footer, Sider, Content } = Layout;
-
-const headerStyle: React.CSSProperties = {
-  textAlign: 'center',
-  color: '#fff',
-  height: 84,
-  paddingInline: 48,
-  lineHeight: '64px',
-  backgroundColor: '#4096ff',
-};
-
-const contentStyle: React.CSSProperties = {
-  textAlign: 'center',
-  minHeight: 120,
-  lineHeight: '120px',
-  color: '#fff',
-//   backgroundColor: '#0958d9',
-};
-
-const siderStyle: React.CSSProperties = {
-  backgroundColor: '#1677ff',
-};
-
-const menuStyle: React.CSSProperties = {
-  height: '100%',
-  borderRight: 0,
-  color: '#fff',
-};
+const { Header, Sider, Content } = Layout;
 
 
-const layoutStyle = {
-  borderRadius: 8,
-  overflow: 'hidden',
-  width: '100%',
-  height: '100%',
-};
 
 const App: React.FC = () => {
   const location = useLocation();
@@ -48,17 +16,17 @@ const App: React.FC = () => {
   const menuItems = [
     {
       key: '/admin/showHotel',
-      icon: <UserOutlined />,
+      icon: <FileOutlined />,
       label: <Link to="/admin/showHotel">酒店总览</Link>,
     },
     {
       key: '/admin/pendHotel',
-      icon: <SettingOutlined />,
+      icon: <FileSearchOutlined />,
       label: <Link to="/admin/pendHotel">审核酒店</Link>,
     },
     {
       key: '/admin/publishHotel',
-      icon: <SettingOutlined />,
+      icon: <FileProtectOutlined />,
       label: <Link to="/admin/publishHotel">发布/下线酒店</Link>,
     },
     {
@@ -69,22 +37,22 @@ const App: React.FC = () => {
   ];
 
   return (
-    <div style={{width:'100vw', height:'100vh', padding: 0, margin: 0, overflow: 'hidden'}}>
-      <Flex gap="middle" style={{width: '100%', height: '100%'}}>
-        <Layout style={layoutStyle}>
-          <Header style={headerStyle}>
-            <div style={{fontSize:'42px', letterSpacing: '20px',paddingTop:'10px'}}>易宿酒店管理系统</div>
+    <div className={styles.container}>
+      <Flex gap="middle" className={styles.flex}>
+        <Layout className={styles.layout}>
+          <Header className={styles.header}>
+            <div className={styles.title}>易宿酒店管理系统</div>
           </Header>
-          <Layout style={{flex: 1}}>
-            <Sider width="20%" style={siderStyle}>
+          <Layout className={styles.subLayout}>
+            <Sider width="20%" className={styles.sider}>
               <Menu
-                style={menuStyle}
+                className={styles.menu}
                 mode="inline"
                 selectedKeys={[currentPath]}
                 items={menuItems}
               />
             </Sider>
-            <Content style={{...contentStyle, minHeight: 'calc(100vh - 64px)', padding: 24}}>
+            <Content className={styles.content}>
               {/* 路由出口，用于展示子路由内容 */}
               <Outlet />
             </Content>

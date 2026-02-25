@@ -20,8 +20,14 @@ export default function PublishHotelPage() {
       // 获取所有酒店（包括已发布和未发布的）
       const result = await getAdminHotelList(page, pageSize);
       //console.log('获取待发布酒店列表成功:', { total: result.total, itemsCount: result.items.length });
-      setHotels(result.items);
-      setTotal(result.total);
+      
+      // 根据筛选条件过滤酒店
+      const filteredHotels = result.items.filter(hotel => {
+        return ['approved', 'published'].includes(hotel.status);
+      });
+      
+      setHotels(filteredHotels);
+      setTotal(filteredHotels.length);
     } catch (error: any) {
       console.error('获取待发布酒店列表失败:', error);
       message.error(error.message || '获取待发布酒店列表失败');
@@ -119,7 +125,7 @@ export default function PublishHotelPage() {
         onPaginationChange={handlePaginationChange}
         title="酒店发布管理"
         filters={{
-          status:'approved'
+          status: ['approved', 'published'],
         }}
         customColumns={actionColumn}
       />

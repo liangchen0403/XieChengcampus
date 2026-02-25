@@ -401,6 +401,7 @@ export const updateRoom = async (roomId: number, roomData: Partial<{
 
 // 管理员获取酒店列表
 export interface AdminHotel {
+  images: any;
   id: number;
   name: string;
   address: string;
