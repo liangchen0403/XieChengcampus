@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Form, Input, message, Alert, Checkbox } from 'antd';
+import { Button, Form, Input, message, Alert } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import Register from '../../components/Register';
+import Register from '../../components/Register/Register';
 import { login } from '../../services/authService';
 import type { LoginRequest } from '../../types/auth';
+import styles from './Login.module.css';
 
 const App: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -57,28 +58,9 @@ const App: React.FC = () => {
 
   return (
     //登录表单
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '16px',
-    }}>
-      <div style={{
-        width: '100%',
-        maxWidth: '400px',
-        background: 'white',
-        padding: '40px',
-        borderRadius: '8px',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
-      }}>
-        <h1 style={{
-          textAlign: 'center',
-          marginBottom: '30px',
-          color: '#1890ff',
-          fontSize: '24px',
-          fontWeight: '600'
-        }}>欢迎登录</h1>
+    <div className={styles.loginContainer}>
+      <div className={styles.loginBox}>
+        <h1 className={styles.loginTitle}>欢迎登录</h1>
         <Form
           name="login"
           initialValues={{ remember: true }}
@@ -89,7 +71,7 @@ const App: React.FC = () => {
             rules={[{ required: true, message: '请输入用户名!' }]}
           >
             <Input 
-              prefix={<UserOutlined style={{ color: '#1890ff' }} />} 
+              prefix={<UserOutlined className={styles.inputIcon} />} 
               placeholder="用户名" 
               size="large"
             />
@@ -99,13 +81,13 @@ const App: React.FC = () => {
             rules={[{ required: true, message: '请输入密码!' }]}
           >
             <Input 
-              prefix={<LockOutlined style={{ color: '#1890ff' }} />} 
+              prefix={<LockOutlined className={styles.inputIcon} />} 
               type="password" 
               placeholder="密码" 
               size="large"
             />
           </Form.Item>
-          <Form.Item style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Form.Item className={styles.rememberForgot}>
           </Form.Item>
           <Form.Item>
             <Button 
@@ -114,11 +96,12 @@ const App: React.FC = () => {
               htmlType="submit" 
               loading={loading}
               size="large"
+              className={styles.loginButton}
             >
               登录
             </Button>
           </Form.Item>
-          <Form.Item style={{ textAlign: 'center', marginTop: '16px' }}>
+          <Form.Item className={styles.registerLink}>
             还没有账号? <Register />
           </Form.Item>
         </Form>

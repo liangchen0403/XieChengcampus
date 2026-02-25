@@ -2,8 +2,9 @@ import { Table, Space, Input, Button, message, Tag, Popconfirm } from 'antd';
 import type { ColumnsType, TableProps } from 'antd/es/table';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import NewHotel from '../../components/NewHotel';
-import { deleteHotel, getHotelList, publishHotel } from '../../services/hotelService';
+import NewHotel from '../../../components/NewHotel/NewHotel';
+import { deleteHotel, getHotelList } from '../../../services/hotelService';
+import styles from './HotelManage.module.css';
 const { Search } = Input;
 
 
@@ -100,7 +101,7 @@ const HotelTable: React.FC = () => {
       // 不设置固定宽度，让列自适应页面宽度
       minWidth: 150,
       filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-        <div style={{ padding: 8 }}>
+        <div className={styles.filterDropdown}>
           <Search
             placeholder="搜索酒店名称"
             value={selectedKeys[0]}
@@ -109,7 +110,7 @@ const HotelTable: React.FC = () => {
               confirm();
               setFilters(prev => ({ ...prev, searchKeyword: selectedKeys[0] as string }));
             }}
-            style={{ width: 150, marginBottom: 8, display: 'block' }}
+            className={styles.filterSearch}
           />
           <Space>
             <Button
@@ -119,7 +120,7 @@ const HotelTable: React.FC = () => {
                 setFilters(prev => ({ ...prev, searchKeyword: selectedKeys[0] as string }));
               }}
               size="small"
-              style={{ width: 90 }}
+              className={styles.filterButton}
             >
               搜索
             </Button>
@@ -129,7 +130,7 @@ const HotelTable: React.FC = () => {
                 setFilters(prev => ({ ...prev, searchKeyword: '' }));
               }}
               size="small"
-              style={{ width: 90 }}
+              className={styles.filterButton}
             >
               重置
             </Button>
@@ -210,7 +211,7 @@ const HotelTable: React.FC = () => {
             </Button>
           </Popconfirm>
         </Space>
-      ),
+      )
     },
   ];
 
@@ -247,7 +248,7 @@ const HotelTable: React.FC = () => {
   };
 
   // 表格变化处理
-  const onChange: TableProps<HotelItem>['onChange'] = (paginationInfo, filters, sorter, extra) => {
+  const onChange: TableProps<HotelItem>['onChange'] = (paginationInfo, filters ) => {
     //console.log('params', paginationInfo, filters, sorter, extra);
     
     // 更新分页信息
@@ -277,7 +278,7 @@ const HotelTable: React.FC = () => {
     onChange: (page: number, pageSize: number) => {
       setPagination(prev => ({ ...prev, current: page, pageSize }));
     },
-    onShowSizeChange: (current: number, size: number) => {
+    onShowSizeChange: (size: number) => {
       setPagination(prev => ({ ...prev, current: 1, pageSize: size }));
     },
   };
@@ -296,14 +297,14 @@ const HotelTable: React.FC = () => {
   });
 
   return (
-    <div style={{ padding: 24 }}>
+    <div className={styles.container}>
       {/* 过滤工具栏 */}
-      <div style={{ marginBottom: 16 }}>
+      <div className={styles.toolbar}>
         <Space wrap>
           <Search
             placeholder="搜索酒店名称"
             allowClear
-            style={{ width: 200 }}
+            className={styles.mainSearch}
             onSearch={handleSearch}
           />
 

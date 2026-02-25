@@ -2,10 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { ExclamationCircleOutlined, HomeOutlined, SettingOutlined, LogoutOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Menu, Button, message } from 'antd';
+import { Menu, Button } from 'antd';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import logo from '../../common/image/Logo.png';
-import { logout } from '../../services/authService';
+import logo from '../../../common/image/Logo.png';
+import { logout } from '../../../services/authService';
+import styles from './Merchant.module.css';
 
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -46,12 +47,12 @@ const App: React.FC = () => {
             <img
                 src={logo}
                 alt="Logo"
-                style={{ height: 60, verticalAlign: 'middle' }}
+                className={styles.logo}
             />
         ),
         key: '#',
         disabled: true,
-        style: { cursor: 'default', background: 'transparent' },
+        className: styles.logoMenuItem,
     },
     {
         label: '首页',
@@ -77,7 +78,7 @@ const App: React.FC = () => {
     {
         label: (
             <Button
-                style={{height:"55px"}}
+                className={styles.logoutButton}
                 type="text"
                 danger
                 icon={<LogoutOutlined />}
@@ -90,7 +91,7 @@ const App: React.FC = () => {
             </Button>
         ),
         key: '/welcome',
-        style: { marginLeft: 'auto' },
+        className: styles.logoutMenuItem,
     },
 ];
 
@@ -105,15 +106,15 @@ const App: React.FC = () => {
 
   return (
     <>
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width:'100vw' }}>
+        <div className={styles.container}>
             <Menu 
                 onClick={onClick} 
                 selectedKeys={[isHotelDetailPage ? '/merchant/HotelDetail' : current]} 
                 mode="horizontal" 
                 items={items}
-                style={{ width: '100%', height:'60px', fontSize:'20px', paddingTop:'5px', marginBottom:'10px' }}
+                className={styles.menu}
             />
-            <div style={{ flex: 1 }}>
+            <div className={styles.content}>
                 <Outlet></Outlet>
             </div>
         </div>

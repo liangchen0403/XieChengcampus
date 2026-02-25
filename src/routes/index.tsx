@@ -1,21 +1,20 @@
-import React, { lazy, Suspense } from 'react';
+import { Suspense } from 'react';
 import type { ReactNode } from 'react';
 import {Navigate} from 'react-router-dom'
 
 import Welcome from '../pages/Welcome/Welcome'
-import Login from '../pages/Login'
+import Login from '../pages/Login/Login'
 
-import MerchantHome from '../pages/Merchant/MerchantHome'
-import HotelManage from '../pages/Merchant/HotelManage'
-import Notice from '../pages/Merchant/Notice'
-import HotelDetail from '../pages/Merchant/HotelDetail'
+import Merchant from '../pages/Merchant/Merchant/Merchant'
+import MerchantHome from '../pages/Merchant/MerchantHome/MerchantHome'
+import HotelManage from '../pages/Merchant/HotelManage/HotelManage'
+import Notice from '../pages/Merchant/Notice/Notice'
+import HotelDetail from '../pages/Merchant/HotelDetail/HotelDetail'
 
-import Admin from '../pages/Admin/admin'
-import ShowHotel from '../pages/Admin/ShowHotel'
-import PendHotel from '../pages/Admin/pendHotel'
-import PublishHotel from '../pages/Admin/PublishHotel'
-
-const MerchantDashboard = lazy(() => import('../pages/Merchant/Merchant'));
+import Admin from '../pages/Admin/adminpage/admin'
+import ShowHotel from '../pages/Admin/ShowHotel/ShowHotel'
+import PendHotel from '../pages/Admin/pendHotel/pendHotel'
+import PublishHotel from '../pages/Admin/PublishHotel/PublishHotel'
 
 export interface RouteConfig {
 	path: string;
@@ -40,20 +39,10 @@ export const routes: RouteConfig[] = [
 			</Suspense>
 		),
 	},
-	// {
-	// 	path: '/register',
-	// 	element: (
-	// 		<Suspense fallback={<div>加载中...</div>}>
-	// 			<Register />
-	// 		</Suspense>
-	// 	),
-	// },
 	{
 		path: '/merchant',
 		element: (
-			<Suspense fallback={<div>加载中...</div>}>
-				<MerchantDashboard />
-			</Suspense>
+			<Merchant />
 		),
 		children:[
 			{

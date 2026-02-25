@@ -77,7 +77,7 @@ const App: React.FC = () => {
             去注册
           </Button>
       <Drawer
-        title="Register"
+        title="注册"
         size={720}
         onClose={onClose}
         open={open}
@@ -97,15 +97,15 @@ const App: React.FC = () => {
         >
           <Form.Item
             name="email"
-            label="E-mail"
+            label="邮箱"
             rules={[
               {
                 type: 'email',
-                message: 'The input is not valid E-mail!',
+                message: '请输入有效的邮箱',
               },
               {
                 required: true,
-                message: 'Please input your E-mail!',
+                message: '请输入邮箱',
               },
             ]}
           >
@@ -114,11 +114,11 @@ const App: React.FC = () => {
 
           <Form.Item
             name="password"
-            label="Password"
+            label="密码"
             rules={[
               {
                 required: true,
-                message: 'Please input your password!',
+                message: '请输入密码',
               },
             ]}
             hasFeedback
@@ -128,20 +128,20 @@ const App: React.FC = () => {
 
           <Form.Item
             name="confirm"
-            label="Confirm Password"
+            label="确认密码"
             dependencies={['password']}
             hasFeedback
             rules={[
               {
                 required: true,
-                message: 'Please confirm your password!',
+                message: '请确认密码',
               },
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   if (!value || getFieldValue('password') === value) {
                     return Promise.resolve();
                   }
-                  return Promise.reject(new Error('The new password that you entered do not match!'));
+                  return Promise.reject(new Error('两次输入的密码不一致'));
                 },
               }),
             ]}
@@ -151,18 +151,18 @@ const App: React.FC = () => {
 
           <Form.Item
             name="username"
-            label="username"
-            tooltip="What do you want others to call you?"
-            rules={[{ required: true, message: 'Please input your nickname!', whitespace: true }]}
+            label="用户名"
+            tooltip="请输入用户名"
+            rules={[{ required: true, message: '请输入用户名', whitespace: true }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="phone"
-            label="Phone Number"
+            label="手机号"
             rules={[
-              { required: true, message: 'Please input your phone number!' },
-              { type: 'tel', message: 'The input is not valid phone number!' },
+              { required: true, message: '请输入手机号' },
+              { type: 'tel', message: '请输入有效的手机号' },
             ]}
           >
             {/* Demo only, real usage should wrap as custom component */}
@@ -174,10 +174,10 @@ const App: React.FC = () => {
           <Form.Item
             name="role"
             label="身份"
-            rules={[{ required: true, message: 'Please select gender!' }]}
+            rules={[{ required: true, message: '请选择身份' }]}
           >
             <Select
-              placeholder="select your gender"
+              placeholder="请选择身份"
               options={[
                 { label: 'Admin', value: 'admin' },
                 { label: 'Merchant', value: 'merchant' },
@@ -196,12 +196,12 @@ const App: React.FC = () => {
             {...tailFormItemLayout}
           >
             <Checkbox>
-              I have read the <a href="">agreement</a>
+              我已阅读并同意 <a href="">注册协议</a>
             </Checkbox>
           </Form.Item>
           <Form.Item {...tailFormItemLayout}>
             <Button type="primary" htmlType="submit" loading={loading}>
-              Register
+              注册
             </Button>
           </Form.Item>
         </Form>

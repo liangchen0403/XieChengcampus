@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Form, Input, Select, DatePicker, InputNumber, message, Upload, Space } from 'antd';
+import { Button, Modal, Form, Input, Select, DatePicker, InputNumber, message, Upload } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
@@ -62,30 +62,30 @@ const App: React.FC = () => {
   };
 
   // 新增标签
-  const handleCreateTag = async (name: string) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post<TagsResponse>('/api/tags', {
-        name,
-        category: 'theme' // 默认分类，可根据实际需求调整
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      if (response.data.code === 200) {
-        // 重新获取标签列表
-        fetchTags();
-        message.success('标签创建成功');
-      } else {
-        message.error('标签创建失败');
-      }
-    } catch (error) {
-      console.error('创建标签失败:', error);
-      message.error('网络请求失败');
-    }
-  };
+  // const handleCreateTag = async (name: string) => {
+  //   try {
+  //     const token = localStorage.getItem('token');
+  //     const response = await axios.post<TagsResponse>('/api/tags', {
+  //       name,
+  //       category: 'theme' // 默认分类，可根据实际需求调整
+  //     }, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //         'Content-Type': 'application/json'
+  //       }
+  //     });
+  //     if (response.data.code === 200) {
+  //       // 重新获取标签列表
+  //       fetchTags();
+  //       message.success('标签创建成功');
+  //     } else {
+  //       message.error('标签创建失败');
+  //     }
+  //   } catch (error) {
+  //     console.error('创建标签失败:', error);
+  //     message.error('网络请求失败');
+  //   }
+  // };
 
   // 当模态框打开时获取标签列表
   useEffect(() => {

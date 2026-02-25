@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Form, Input, InputNumber, Select, Upload, Drawer, Space, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
+import type { UploadProps } from 'antd/es/upload/interface';
 import { addRoom } from '../../services/hotelService';
 
 interface AddRoomProps {
@@ -92,7 +92,7 @@ const AddRoom: React.FC<AddRoomProps> = ({ hotelId, open, onClose, onSuccess }) 
       // 输出请求体内容
       //console.log('=== 请求体内容 ===');
       //console.log('文本字段:');
-      formData.forEach((value, key) => {
+      formData.forEach((value) => {
         if (typeof value === 'string') {
           //console.log(`${key}: ${value}`);
         } else if (value instanceof Blob) {

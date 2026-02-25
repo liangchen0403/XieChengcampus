@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Space, message, Modal, Input } from 'antd';
+import { useState, useEffect } from 'react';
+import { Button, Space, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import HotelTable from './HotelTable';
-import { getAdminHotelList, publishHotel, type AdminHotel } from '../../services/hotelService';
+import HotelTable from '../HotelTable/HotelTable';
+import { getAdminHotelList, publishHotel, type AdminHotel } from '../../../services/hotelService';
+import styles from './PublishHotel.module.css';
 
 export default function PublishHotelPage() {
   const [hotels, setHotels] = useState<AdminHotel[]>([]);
@@ -115,7 +116,7 @@ export default function PublishHotelPage() {
   ];
 
   return (
-    <div style={{ padding: 12 }}>
+    <div className={styles.container}>
       <HotelTable
         hotels={hotels}
         loading={loading}

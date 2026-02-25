@@ -1,58 +1,11 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Table, Tag, Flex, Button, Modal, Image, Carousel } from 'antd';
-import type { TableProps } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { createStaticStyles } from 'antd-style';
-import type { AdminHotel } from '../../services/hotelService';
+import type { AdminHotel } from '../../../services/hotelService';
 import { EyeOutlined } from '@ant-design/icons';
+import styles from './HotelTable.module.css';
 
-const classNames = createStaticStyles(({ css }) => ({
-  root: css`
-    color: #e0e0e0;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  `,
-}));
 
-const stylesFn: TableProps<any>['styles'] = (info) => {
-  if (info?.props?.size === 'middle') {
-    return {
-      root: {
-        color: '#e0e0e0',
-        borderRadius: 8,
-        boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-      },
-      title: {
-        backgroundImage: 'linear-gradient(90deg, #6a5acd, #836fff)',
-        color: '#fff',
-        fontSize: '1.25rem',
-        fontWeight: 600,
-        padding: '12px 16px',
-      },
-      footer: {
-        color: '#9ca3af',
-      },
-      header: {
-        cell: {
-          fontWeight: 600,
-          fontSize: '0.95rem',
-          color: '#b8bdfd',
-          padding: '12px 16px',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
-        },
-      },
-      pagination: {
-        root: {
-          padding: 10,
-        },
-        item: {
-          color: '#b8bdfd',
-        },
-      },
-    } satisfies TableProps<any>['styles'];
-  }
-  return {};
-};
 
 // 状态颜色映射
 const statusColorMap: Record<string, string> = {
@@ -104,7 +57,7 @@ const columns: ColumnsType<AdminHotel> = [
     sorter: (a: { star: number; }, b: { star: number; }) => a.star - b.star,
     render: (star: number) => {
       return Array.from({ length: star }).map((_, index) => (
-        <span key={index} style={{ color: '#ffd700' }}>★</span>
+        <span key={index} className={styles.star}>★</span>
       ));
     },
   },
@@ -303,8 +256,6 @@ const HotelTable: React.FC<HotelTableProps> = ({
         dataSource={filteredHotels}
         columns={combinedColumns}
         rowKey="id"
-        classNames={classNames}
-        styles={stylesFn}
         title={() => title}
         pagination={{
           current: page,
@@ -332,30 +283,30 @@ const HotelTable: React.FC<HotelTableProps> = ({
         width={800}
       >
         {currentHotel?.coverImage ? (
-          <Carousel autoplay={false} dots={true} style={{ maxHeight: '500px' }}>
+          <Carousel autoplay={false} dots={true} className={styles.carousel}>
             <div>
               <Image
                 src={currentHotel.coverImage}
                 alt={`${currentHotel.name} 封面图片`}
-                style={{ maxWidth: '100%', maxHeight: '500px' }}
+                className={styles.carouselImage}
                 preview={false}
               />
-              <p style={{ textAlign: 'center', marginTop: 16, color: '#666' }}>酒店封面图片</p>
+              <p className={styles.imageCaption}>酒店封面图片</p>
             </div>
             {currentHotel.images && currentHotel.images.map((image: string | undefined, index: number) => (
               <div key={index}>
                 <Image
                   src={image}
                   alt={`${currentHotel.name} 图片 ${index + 1}`}
-                  style={{ maxWidth: '100%', maxHeight: '500px' }}
+                  className={styles.carouselImage}
                   preview={false}
                 />
-                <p style={{ textAlign: 'center', marginTop: 16, color: '#666' }}>图片 {index + 1}</p>
+                <p className={styles.imageCaption}>图片 {index + 1}</p>
               </div>
             ))}
           </Carousel>
         ) : (
-          <div style={{ textAlign: 'center', padding: '40px 0', color: '#999' }}>
+          <div className={styles.noImage}>
             暂无图片
           </div>
         )}

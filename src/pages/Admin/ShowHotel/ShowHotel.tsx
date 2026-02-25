@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { message, type TableProps } from 'antd';
+import { message, } from 'antd';
 
-import { getAdminHotelList, type AdminHotel } from '../../services/hotelService';
-import HotelTable from './HotelTable';
+import { getAdminHotelList, type AdminHotel } from '../../../services/hotelService';
+import HotelTable from '../HotelTable/HotelTable';
+import styles from './ShowHotel.module.css';
 
 const ShowHotel: React.FC = () => {
   const [hotels, setHotels] = useState<AdminHotel[]>([]);
@@ -48,7 +49,7 @@ const ShowHotel: React.FC = () => {
 
 
   return (
-    <div style={{ padding: 12 }}>
+    <div className={styles.container}>
       <HotelTable
         hotels={hotels}
         loading={loading}

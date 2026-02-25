@@ -5,7 +5,6 @@ import {
   Descriptions,
   Image,
   Tag,
-  List,
   Space,
   Button,
   Typography,
@@ -20,11 +19,12 @@ import {
   Popconfirm,
 } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { getHotelDetail, updateHotelInfo, deleteRoom, type HotelDetail as HotelDetailType } from '../../services/hotelService';
-import AddRoom from '../../components/AddRoom';
-import UpdateRoom from '../../components/UpdateRoom';
+import { getHotelDetail, updateHotelInfo, deleteRoom, type HotelDetail as HotelDetailType } from '../../../services/hotelService';
+import AddRoom from '../../../components/AddRoom/AddRoom';
+import UpdateRoom from '../../../components/UpdateRoom/UpdateRoom';
 
 import axios from 'axios';
+import styles from './HotelDetail.module.css';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -58,7 +58,7 @@ const HotelDetail: React.FC = () => {
   const [roomDrawerOpen, setRoomDrawerOpen] = useState(false);
   const [form] = Form.useForm();
   const [tags, setTags] = useState<Tag[]>([]);
-  const [tagsLoading, setTagsLoading] = useState(false);
+  const [, setTagsLoading] = useState(false);
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [currentRoom, setCurrentRoom] = useState<any>(null);
   
@@ -129,18 +129,18 @@ const HotelDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div style={{ padding: 24, textAlign: 'center' }}>
+      <div className={styles.loadingContainer}>
         <Spin size="large" />
-        <div style={{ marginTop: 16 }}>加载中...</div>
+        <div className={styles.loadingText}>加载中...</div>
       </div>
     );
   }
 
   if (!hotelDetail) {
     return (
-      <div style={{ padding: 24, textAlign: 'center' }}>
+      <div className={styles.errorContainer}>
         <Text type="danger">未找到酒店信息</Text>
-        <Button type="primary" onClick={handleBack} style={{ marginTop: 16 }}>
+        <Button type="primary" onClick={handleBack} className={styles.backButton}>
           返回列表
         </Button>
       </div>
@@ -211,15 +211,7 @@ const HotelDetail: React.FC = () => {
       message.error(error.message || '删除房型失败，请检查网络或重试');
     }
   };
-  // 轮播图样式
-  const contentStyle: React.CSSProperties = {
-    margin: 0,
-    height: '160px',
-    color: '#fff',
-    lineHeight: '160px',
-    textAlign: 'center',
-    background: '#364d79',
-  };
+
   // 状态标签颜色映射
   const statusColorMap: Record<string, string> = {
     pending: 'orange',
@@ -239,9 +231,9 @@ const HotelDetail: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: 24 }}>
+    <div className={styles.container}>
       {/* 头部导航 */}
-      <div style={{ marginBottom: 24 }}>
+      <div className={styles.header}>
         <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
           返回列表
         </Button>
@@ -257,21 +249,21 @@ const HotelDetail: React.FC = () => {
             </Tag>
           </Space>
         }
-        style={{ marginBottom: 24 }}
+        className={styles.hotelCard}
       >
         {/* 酒店图片 */}
-        <div style={{ marginBottom: 24 }}>
+        <div className={styles.imagesSection}>
           <Title level={4}>酒店图片</Title>
-          <Carousel autoplay style={{ maxWidth: 800, margin: '0 auto' }} draggable={true}>
+          <Carousel autoplay className={styles.mainCarousel} draggable={true}>
             {hotelDetail.images.map((image) => (
-              <div key={image.id} style={{ textAlign: 'center', padding: 20 }}>
+              <div key={image.id} className={styles.carouselItem}>
                 <Image
                   width={700}
                   src={image.url}
                   alt={`${hotelDetail.name} - ${image.type}`}
                   loading="lazy"
                 />
-                <div style={{ marginTop: 16 }}>
+                <div className={styles.imageType}>
                   <Tag>{image.type === 'main' ? '主图' : '设施图'}</Tag>
                 </div>
               </div>
@@ -284,7 +276,7 @@ const HotelDetail: React.FC = () => {
             form={form}
             layout="vertical"
             onFinish={handleSubmit}
-            style={{ marginBottom: 24 }}
+            className={styles.editForm}
           >
             <Title level={4}>基本信息</Title>
             <Form.Item
@@ -353,8 +345,8 @@ const HotelDetail: React.FC = () => {
         ) : (
           <>
             {/* 酒店基本信息 */}
-            <div style={{ marginBottom: 24 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <div className={styles.infoSection}>
+              <div className={styles.sectionHeader}>
                 <Title level={4}>基本信息</Title>
                 <Button type="primary" size="small" onClick={() => setEditing(true)}>
                   修改信息
@@ -364,7 +356,7 @@ const HotelDetail: React.FC = () => {
                 <Descriptions.Item label="酒店地址">{hotelDetail.address}</Descriptions.Item>
                 <Descriptions.Item label="酒店星级">
                   {Array.from({ length: hotelDetail.star }).map((_, index) => (
-                    <span key={index}>★</span>
+                    <span key={index} className={styles.star}>★</span>
                   ))}
                 </Descriptions.Item>
                 <Descriptions.Item label="评分">{hotelDetail.rating}</Descriptions.Item>
@@ -380,13 +372,13 @@ const HotelDetail: React.FC = () => {
             </div>
 
             {/* 酒店描述 */}
-            <div style={{ marginBottom: 24 }}>
+            <div className={styles.descriptionSection}>
               <Title level={4}>酒店描述</Title>
               <Paragraph>{hotelDetail.description}</Paragraph>
             </div>
 
             {/* 酒店标签 */}
-            <div style={{ marginBottom: 24 }}>
+            <div className={styles.tagsSection}>
               <Title level={4}>酒店标签</Title>
               <Space wrap>
                 {hotelDetail.tags.map((tag, index) => (
@@ -402,8 +394,8 @@ const HotelDetail: React.FC = () => {
         <Divider />
 
         {/* 房型信息 */}
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <div className={styles.roomsSection}>
+          <div className={styles.sectionHeader}>
             <Title level={4}>房型信息</Title>
             <Button type="primary" size="small" onClick={handleAddRoom}>
               添加房型
@@ -414,9 +406,9 @@ const HotelDetail: React.FC = () => {
               <Card
                 key={room.id}
                 title={room.type}
-                style={{ marginBottom: 16 }}
+                className={styles.roomCard}
                 extra={
-                  <Text strong style={{ fontSize: 18, color: '#ff4d4f' }}>
+                  <Text strong className={styles.roomPrice}>
                     ¥{room.price}
                   </Text>
                 }
@@ -431,11 +423,11 @@ const HotelDetail: React.FC = () => {
 
                 {/* 房型图片 */}
                 {room.images.length > 0 && (
-                  <div style={{ marginTop: 16 }}>
+                  <div className={styles.roomImages}>
                     <Text strong>房型图片：</Text>
-                    <Carousel autoplay style={{ maxWidth: 400, marginTop: 8 }}>
+                    <Carousel autoplay className={styles.roomCarousel}>
                       {room.images.map((img, index) => (
-                        <div key={index} style={{ textAlign: 'center', padding: 10 }}>
+                        <div key={index} className={styles.roomCarouselItem}>
                           <Image
                             width={300}
                             height={200}
@@ -450,9 +442,9 @@ const HotelDetail: React.FC = () => {
                 )}
 
                 {/* 房间设施 */}
-                <div style={{ marginTop: 16 }}>
+                <div className={styles.roomAmenities}>
                   <Text strong>房间设施：</Text>
-                  <Space wrap style={{ marginTop: 8 }}>
+                  <Space wrap className={styles.amenitiesList}>
                     {room.amenities.map((amenity, index) => (
                       <Tag key={index}>{amenity}</Tag>
                     ))}
@@ -460,7 +452,7 @@ const HotelDetail: React.FC = () => {
                 </div>
 
                 {/* 操作按钮 */}
-                <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
+                <div className={styles.roomActions}>
                   <Space size="small">
                     <Button type="primary" size="small" onClick={() => handleUpdateRoom(room)}>
                       更新
