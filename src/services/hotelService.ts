@@ -439,13 +439,12 @@ export const getAdminHotelList = async (
 ): Promise<AdminHotelResponse['data']> => {
   const token = localStorage.getItem('token');
   console.log('请求参数:', { page, pageSize, status, merchantId });
-  const response = await axios.get<AdminHotelResponse>('/api/admin/hotels', {
-    data: {
+  const response = await axios.post<AdminHotelResponse>('/api/admin/hotels', {
       page,
       pageSize,
       status,
       merchantId,
-    },
+    },{
     headers: {
       Authorization: `Bearer ${token}`,
     },
