@@ -83,7 +83,7 @@ const AddRoom: React.FC<AddRoomProps> = ({ hotelId, open, onClose, onSuccess }) 
                 setLoading(false);
                 return;
               }
-              formData.append('images', file.originFileObj as Blob);
+              formData.append('files', file.originFileObj as Blob);
             }
           }
         });

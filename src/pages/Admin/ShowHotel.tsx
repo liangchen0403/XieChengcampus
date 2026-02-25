@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { message } from 'antd';
+import { message, type TableProps } from 'antd';
 
 import { getAdminHotelList, type AdminHotel } from '../../services/hotelService';
 import HotelTable from './HotelTable';
@@ -7,19 +7,25 @@ import HotelTable from './HotelTable';
 const ShowHotel: React.FC = () => {
   const [hotels, setHotels] = useState<AdminHotel[]>([]);
   const [loading, setLoading] = useState(true);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
 
   // 获取酒店列表
   const fetchHotels = async () => {
-    console.log('获取酒店列表:', { page, pageSize });
+    console.log('获取酒店列表:', { page: pagination.current, pageSize: pagination.pageSize });
     setLoading(true);
     try {
-      const result = await getAdminHotelList(page, pageSize);
+      const result = await getAdminHotelList(pagination.current, pagination.pageSize);
+      console.log("---------------------------",pagination);
       console.log('获取酒店列表成功:', { total: result.total, itemsCount: result.items.length });
       setHotels(result.items);
-      setTotal(result.total);
+      setPagination(prev => ({
+        ...prev,
+        total: result.total,
+      }));
     } catch (error: any) {
       console.error('获取酒店列表失败:', error);
       message.error(error.message || '获取酒店列表失败');
@@ -28,26 +34,40 @@ const ShowHotel: React.FC = () => {
     }
   };
 
+  // 表格变化处理
+  const onChange: TableProps<AdminHotel>['onChange'] = (paginationInfo) => {
+    console.log('分页变化:', paginationInfo);
+    
+    // 更新分页信息
+    if (paginationInfo.current) {
+      setPagination(prev => ({
+        ...prev,
+        current: paginationInfo.current || 1,
+        pageSize: paginationInfo.pageSize || 10,
+      }));
+    }
+  };
+
   // 处理分页变化
   const handlePaginationChange = (current: number, size: number) => {
     console.log('分页变化:', { current, size });
-    setPage(current);
-    setPageSize(size);
+    setPagination(prev => ({ ...prev, current, pageSize: size }));
   };
 
   // 当分页变化时，重新获取数据
   useEffect(() => {
     fetchHotels();
-  }, [page, pageSize]);
+  }, [pagination.current, pagination.pageSize]);
+
 
   return (
     <div style={{ padding: 12 }}>
       <HotelTable
         hotels={hotels}
         loading={loading}
-        total={total}
-        page={page}
-        pageSize={pageSize}
+        total={pagination.total}
+        page={pagination.current}
+        pageSize={pagination.pageSize}
         onPaginationChange={handlePaginationChange}
         title="酒店总览"
       />

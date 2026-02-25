@@ -23,7 +23,7 @@ interface HotelFormValues {
   description?: string;
   star?: number;
   openingDate: Dayjs;
-  tagIds?: string[];
+  tagIds?: number[];
   images: UploadFile[];
 }
 
@@ -104,9 +104,6 @@ const App: React.FC = () => {
   const handleSubmit = async (values: HotelFormValues) => {
     setConfirmLoading(true);
     try {
-      // 将标签数组转换为字符串，以便与后端接口兼容
-      const tagIdsString = values.tagIds?.join(',') || undefined;
-      
       // 发送请求
       const result = await createHotelWithFiles(
         values.name,
@@ -114,7 +111,7 @@ const App: React.FC = () => {
         values.description,
         values.star,
         values.openingDate,
-        tagIdsString,
+        values.tagIds || [],
         values.images
       );
 
@@ -211,7 +208,7 @@ const App: React.FC = () => {
               style={{ width: '100%' }}
               placeholder="请选择酒店标签"
               options={tags.map(tag => ({
-                value: tag.name,
+                value: tag.id,
                 label: tag.name
               }))}
               tokenSeparators={[',']}

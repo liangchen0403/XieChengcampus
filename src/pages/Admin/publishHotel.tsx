@@ -4,7 +4,7 @@ import type { ColumnsType } from 'antd/es/table';
 import HotelTable from './HotelTable';
 import { getAdminHotelList, publishHotel, type AdminHotel } from '../../services/hotelService';
 
-export default function PublishHotelPage(hotelId?: number, p0?: string) {
+export default function PublishHotelPage() {
   const [hotels, setHotels] = useState<AdminHotel[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
@@ -31,10 +31,12 @@ export default function PublishHotelPage(hotelId?: number, p0?: string) {
   };
 
   // 处理分页变化
-  const handlePaginationChange = (current: number, size: number) => {
+  const handlePaginationChange = (current: number, size?: number) => {
     console.log('分页变化:', { current, size });
     setPage(current);
-    setPageSize(size);
+    if (size !== undefined) {
+      setPageSize(size);
+    }
   };
 
   // 处理发布酒店

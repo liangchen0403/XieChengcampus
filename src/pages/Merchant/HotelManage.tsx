@@ -76,8 +76,7 @@ const HotelTable: React.FC = () => {
       setPagination(prev => ({
         ...prev,
         total: result.total,
-        current: result.page,
-        pageSize: result.pageSize,
+        // 保持当前分页状态，不使用后端返回的 page，避免切换页码后被重置
       }));
     } catch (error: any) {
       message.error(error.message || '获取数据失败');
@@ -199,9 +198,6 @@ const HotelTable: React.FC = () => {
           <Button type="link" size="small" onClick={() => handleView(record)}>
             查看
           </Button>
-          <Button type="link" size="small" onClick={() => handleEdit(record)}>
-            编辑
-          </Button>
           <Popconfirm
             title="确认删除吗？"
             description="确认删除酒店吗？"
@@ -235,11 +231,6 @@ const HotelTable: React.FC = () => {
       console.error('删除酒店失败:', error);
       message.error('删除失败，请重试');
     }
-  };
-
-  const handleEdit = (record: HotelItem) => {
-    console.log('编辑酒店:', record);
-    // 跳转到编辑页面
   };
 
   // 搜索处理

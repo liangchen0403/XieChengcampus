@@ -17,14 +17,37 @@ import {
   Input,
   InputNumber,
   Select,
+  Popconfirm,
 } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { getHotelDetail, updateHotelInfo, type HotelDetail as HotelDetailType } from '../../services/hotelService';
+import { getHotelDetail, updateHotelInfo, deleteRoom, type HotelDetail as HotelDetailType } from '../../services/hotelService';
 import AddRoom from '../../components/AddRoom';
+import UpdateRoom from '../../components/UpdateRoom';
+
+import axios from 'axios';
 
 const { Title, Text, Paragraph } = Typography;
 
+interface HotelFormNewValues {
+  name: string;
+  address: string;
+  description?: string;
+  star?: number;
+  openingDate?: string;
+  facilityIds?: number[];
+  tagIds?: number[];
+}
 
+interface Tag {
+  id: number;
+  name: string;
+  category: string;
+}
+
+interface TagsResponse {
+  code: number;
+  data: Tag[];
+}
 
 const HotelDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,22 +57,54 @@ const HotelDetail: React.FC = () => {
   const [editing, setEditing] = useState(false);
   const [roomDrawerOpen, setRoomDrawerOpen] = useState(false);
   const [form] = Form.useForm();
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [tagsLoading, setTagsLoading] = useState(false);
+  const [updateModalVisible, setUpdateModalVisible] = useState(false);
+  const [currentRoom, setCurrentRoom] = useState<any>(null);
+  
 
   // 当酒店详情加载完成或编辑模式切换时，设置表单值
   useEffect(() => {
     if (hotelDetail && editing) {
+      const tagIdsFromDetail =
+        tags.length > 0
+          ? tags
+              .filter((t) => hotelDetail.tags.includes(t.name))
+              .map((t) => t.id)
+          : [];
+
       form.setFieldsValue({
         name: hotelDetail.name,
         address: hotelDetail.address,
         description: hotelDetail.description,
         star: hotelDetail.star,
-        tags: hotelDetail.tags,
+        openingDate: hotelDetail.openingDate,
+        tagIds: tagIdsFromDetail,
+        facilityIds: [] // 暂无设施数据源时保持空
       });
+      console.log(hotelDetail.tags);
     }
-  }, [hotelDetail, editing, form]);
+  }, [hotelDetail, editing, form, tags]);
 
   const handleBack = () => {
     navigate('/merchant/HotelManage');
+  };
+
+  const fetchTags = async () => {
+    setTagsLoading(true);
+    try {
+      const response = await axios.get<TagsResponse>('/api/tags');
+      if (response.data.code === 200) {
+        setTags(response.data.data);
+      } else {
+        message.error('获取标签列表失败');
+      }
+    } catch (error) {
+      console.error('获取标签列表失败:', error);
+      message.error('网络请求失败');
+    } finally {
+      setTagsLoading(false);
+    }
   };
 
   const fetchHotelDetail = async () => {
@@ -69,6 +124,7 @@ const HotelDetail: React.FC = () => {
 
   useEffect(() => {
     fetchHotelDetail();
+    fetchTags();
   }, [id]);
 
   if (loading) {
@@ -92,19 +148,32 @@ const HotelDetail: React.FC = () => {
   }
 
   // 处理修改提交
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: HotelFormNewValues) => {
     if (!id) return;
     
     try {
-      const response = await updateHotelInfo(parseInt(id), values);
-      message.success(response.message || '酒店信息修改成功');
-      setEditing(false);
-      // 重新获取酒店详情
-      fetchHotelDetail();
-    } catch (error: any) {
-      console.error('修改酒店信息失败:', error);
-      message.error(error.message || '修改酒店信息失败，请重试');
-    }
+      const result = await updateHotelInfo(
+        hotelDetail.id,
+        values.name,
+        values.address,
+        values.description,
+        values.star ?? hotelDetail.star,
+        hotelDetail.images.map(img => ({ url: img.url, type: img.type })),
+        values.facilityIds || [],
+        values.tagIds || []
+      );
+      if (result.code === 200) {
+        message.success('酒店信息修改成功！');
+        setEditing(false);
+        // 重新获取酒店详情
+        fetchHotelDetail();
+      } else {
+        message.error('修改酒店信息失败');
+      }
+    } catch (error) {
+      console.error('修改酒店信息错误:', error);
+      message.error('修改酒店信息失败，请检查网络或重试');
+    } 
   };
 
   // 处理添加房型
@@ -116,6 +185,31 @@ const HotelDetail: React.FC = () => {
   const handleRoomAddSuccess = () => {
     // 重新获取酒店详情
     fetchHotelDetail();
+  };
+
+  // 处理更新房型
+  const handleUpdateRoom = (room: any) => {
+    setCurrentRoom(room);
+    setUpdateModalVisible(true);
+  };
+
+  // 处理删除房型
+  const handleDeleteRoom = async (roomId: number) => {
+    if (!id) return;
+    
+    try {
+      const result = await deleteRoom(parseInt(id), roomId);
+      if (result.code === 204) {
+        message.success('删除房型成功！');
+        // 刷新页面
+        window.location.reload();
+      } else {
+        message.error(result.message || '删除房型失败');
+      }
+    } catch (error: any) {
+      console.error('删除房型错误:', error);
+      message.error(error.message || '删除房型失败，请检查网络或重试');
+    }
   };
   // 轮播图样式
   const contentStyle: React.CSSProperties = {
@@ -175,6 +269,7 @@ const HotelDetail: React.FC = () => {
                   width={700}
                   src={image.url}
                   alt={`${hotelDetail.name} - ${image.type}`}
+                  loading="lazy"
                 />
                 <div style={{ marginTop: 16 }}>
                   <Tag>{image.type === 'main' ? '主图' : '设施图'}</Tag>
@@ -219,21 +314,29 @@ const HotelDetail: React.FC = () => {
               <Input.TextArea rows={4} />
             </Form.Item>
             <Form.Item
-              name="tags"
-              label="酒店标签"
+              name="facilityIds"
+              label="设施"
             >
               <Select
-                mode="tags"
+                mode="multiple"
+                placeholder="选择设施"
                 style={{ width: '100%' }}
-                placeholder="请选择或输入酒店标签"
-                options={[
-                  { value: '江景', label: '江景' },
-                  { value: '奢华', label: '奢华' },
-                  { value: '亲子', label: '亲子' },
-                  { value: '商务', label: '商务' },
-                  { value: '度假', label: '度假' },
-                ]}
-                tokenSeparators={[',']}
+              >
+                {/* 后续可从API获取设施列表 */}
+              </Select>
+            </Form.Item>
+            <Form.Item
+              name="tagIds"
+              label="标签"
+            >
+              <Select
+                mode="multiple"
+                placeholder="选择标签"
+                style={{ width: '100%' }}
+                options={tags.map(tag => ({
+                  value: tag.id,
+                  label: tag.name
+                }))}
               />
             </Form.Item>
             <Form.Item>
@@ -338,6 +441,7 @@ const HotelDetail: React.FC = () => {
                             height={200}
                             src={img}
                             alt={`${room.type} - 图片${index + 1}`}
+                            loading="lazy"
                           />
                         </div>
                       ))}
@@ -354,6 +458,26 @@ const HotelDetail: React.FC = () => {
                     ))}
                   </Space>
                 </div>
+
+                {/* 操作按钮 */}
+                <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
+                  <Space size="small">
+                    <Button type="primary" size="small" onClick={() => handleUpdateRoom(room)}>
+                      更新
+                    </Button>
+                    <Popconfirm
+                      title="确认删除"
+                      description="确定要删除这个房型吗？此操作不可恢复。"
+                      onConfirm={() => handleDeleteRoom(room.id)}
+                      okText="确定"
+                      cancelText="取消"
+                    >
+                      <Button danger size="small">
+                        删除
+                      </Button>
+                    </Popconfirm>
+                  </Space>
+                </div>
               </Card>
             ))}
           </div>
@@ -366,6 +490,16 @@ const HotelDetail: React.FC = () => {
             open={roomDrawerOpen}
             onClose={() => setRoomDrawerOpen(false)}
             onSuccess={handleRoomAddSuccess}
+          />
+        )}
+
+        {/* 更新房型组件 */}
+        {currentRoom && (
+          <UpdateRoom
+            visible={updateModalVisible}
+            room={currentRoom}
+            onClose={() => setUpdateModalVisible(false)}
+            onSuccess={fetchHotelDetail}
           />
         )}
       </Card>

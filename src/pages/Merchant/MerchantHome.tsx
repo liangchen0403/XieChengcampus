@@ -1,5 +1,5 @@
 import React from 'react'
-import homePage from '../../common/image/homePage.png'
+import homePage from '../../common/image/welcome.png'
 
 export default function MerchantHome() {
   return (

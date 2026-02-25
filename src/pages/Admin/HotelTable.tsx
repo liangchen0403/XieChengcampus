@@ -309,7 +309,7 @@ const HotelTable: React.FC<HotelTableProps> = ({
         pagination={{
           current: page,
           pageSize: pageSize,
-          total: filteredHotels.length,
+          total: total,
           onChange: onPaginationChange,
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '50'],

@@ -35,10 +35,12 @@ export default function pendHotel() {
   };
 
   // 处理分页变化
-  const handlePaginationChange = (current: number, size: number) => {
+  const handlePaginationChange = (current: number, size?: number) => {
     console.log('分页变化:', { current, size });
     setPage(current);
-    setPageSize(size);
+    if (size !== undefined) {
+      setPageSize(size);
+    }
   };
 
   // 打开审核模态框
